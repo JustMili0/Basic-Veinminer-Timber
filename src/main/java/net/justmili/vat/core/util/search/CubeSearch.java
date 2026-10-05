@@ -1,7 +1,7 @@
-package net.justmili.vat.content.mechanics.logic.search;
+package net.justmili.vat.core.util.search;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.ArrayList;
@@ -12,7 +12,7 @@ import java.util.function.Predicate;
 public class CubeSearch implements SearchAlgorithm {
 
     @Override
-    public List<BlockPos> search(ServerLevel level, BlockPos origin, Predicate<BlockState> stateMatch, int maxRadius, int maxSize) {
+    public List<BlockPos> search(Level level, BlockPos origin, Predicate<BlockState> stateMatch, int maxRadius, int maxSize) {
         var found = new ArrayList<BlockPos>();
 
         for (var pos : withinClosed(origin, maxRadius)) {

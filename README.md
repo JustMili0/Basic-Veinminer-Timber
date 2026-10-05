@@ -1,3 +1,3 @@
-# Basic Veinminer & Timer
-Something something mining go brrrr
+# Basic Veinminer & Timber
+The most basic you can get
 <hr>

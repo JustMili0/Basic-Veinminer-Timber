@@ -1,10 +1,11 @@
-package net.justmili.vat.content.mechanics.logic;
+package net.justmili.vat.core.util;
 
-import net.justmili.vat.content.mechanics.logic.search.SearchAlgorithms;
+import net.justmili.vat.core.util.search.SearchAlgorithms;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.LevelEvent;
 import net.minecraft.world.level.block.state.BlockState;
@@ -34,7 +35,7 @@ public class BlockBreaking {
 
     }
 
-    public static List<BlockPos> breadthFirstSearch(ServerLevel level, BlockPos origin, Predicate<BlockState> stateMatch, int maxRadius, int maxSize) {
+    public static List<BlockPos> breadthFirstSearch(Level level, BlockPos origin, Predicate<BlockState> stateMatch, int maxRadius, int maxSize) {
         return SearchAlgorithms.BREADTH_FIRST_SEARCH.search(level, origin, stateMatch, maxRadius, maxSize);
     }
 }
