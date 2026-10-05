@@ -1,7 +1,7 @@
 # See https://stonecutter.kikugie.dev/wiki/config/properties#centralized-properties
-mod.id = "vat"
-mod.name = "Basic Veinminer & timber"
-mod.group = "net.justmili.vat"
+mod.id = "bvat"
+mod.name = "Basic Veinminer & Timber"
+mod.group = "net.justmili.bvat"
 mod.version = "0.0.1a"
 
 deps.fabric_loader = "0.19.5"

@@ -15,16 +15,16 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "net.justmili.vat.Vat"
+      "net.justmili.bvat.BVaT"
     ],
     "client" : [
-      "net.justmili.vat.client.FabricClient"
+      "net.justmili.bvat.client.FabricClient"
     ]
   },
   "mixins": [
-    "vat.mixins.json"
+    "bvat.mixins.json"
   ],
-  "accessWidener": "vat.ct",
+  "accessWidener": "bvat.ct",
   "depends": {
     "fabricloader": ">=${loader}",
     "minecraft": "${minecraft}"
