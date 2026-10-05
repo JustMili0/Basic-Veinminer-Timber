@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "${id}",
+  "version": "${version}",
+  "name": "${name}",
+  "description": "A really basic veinminer and timber in one",
+  "authors": ["JustMili"],
+  "contact": {
+    "homepage": "",
+    "sources": "",
+    "issues": ""
+  },
+  "license": "All Rights Reserved",
+  "icon": "icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "net.justmili.vat.Vat"
+    ],
+    "client" : [
+      "net.justmili.vat.client.FabricClient"
+    ]
+  },
+  "mixins": [
+    "vat.mixins.json"
+  ],
+  "accessWidener": "vat.ct",
+  "depends": {
+    "fabricloader": ">=${loader}",
+    "minecraft": "${minecraft}"
+  }
+}

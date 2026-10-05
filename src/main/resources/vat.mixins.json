@@ -1,0 +1,11 @@
+{
+  "required": true,
+  "package": "net.justmili.vat.core.mixin",
+  "compatibilityLevel": "${java}",
+  "mixins": [
+    "ServerPlayerGameModeMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
