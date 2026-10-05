@@ -8,7 +8,6 @@ import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.justmili.bvat.core.util.Maths;
 import net.justmili.bvat.core.util.search.SearchAlgorithms;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
@@ -31,38 +30,39 @@ public class BlockGroupHighlighter {
      *
      * @return true to let vanilla draw its own outline, false to cancel it.
      */
-    public static boolean render(WorldRenderContext context, WorldRenderContext.BlockOutlineContext outline, RenderType highlightType,
-                                 Player player, Predicate<BlockState> stateMatch, int maxRadius, int maxSize, float red, float green, float blue, float opacity) {
+    public static boolean render(WorldRenderContext context, WorldRenderContext.BlockOutlineContext outline, Player player,
+                                 Predicate<BlockState> stateMatch, int maxRadius, int maxSize, float red, float green, float blue, float opacity) {
         var level = context.world();
         var matrix = context.matrixStack();
         var consumer = context.consumers();
         if (level == null || matrix == null || consumer == null) return true;
 
-        var shape = shapeFor(level, player, outline.blockPos(), outline.blockState(), stateMatch, maxRadius, maxSize);
+        var shape = getGroupShape(level, player, outline.blockPos(), outline.blockState(), stateMatch, maxRadius, maxSize);
         if (shape == null) return true; // single block, vanilla outline is fine
 
-        renderShape(matrix, consumer.getBuffer(highlightType), shape, -outline.cameraX(), -outline.cameraY(), -outline.cameraZ(), red, green, blue, opacity);
+        renderOutlineShape(matrix, consumer.getBuffer(RenderType.lines()), shape, -outline.cameraX(), -outline.cameraY(), -outline.cameraZ(), red, green, blue, opacity);
         return false;
     }
 
-    public static boolean render(WorldRenderContext context, WorldRenderContext.BlockOutlineContext outline, RenderType highlightType,
-                                 Player player, Predicate<BlockState> stateMatch, int maxRadius, int maxSize) {
-        return render(context, outline, highlightType, player, stateMatch, maxRadius, maxSize, 0f, 0f, 0f, 0.4f);
+    public static boolean render(WorldRenderContext context, WorldRenderContext.BlockOutlineContext outline, Player player,
+                                 Predicate<BlockState> stateMatch, int maxRadius, int maxSize) {
+        // Render with default outline color
+        return render(context, outline, player, stateMatch, maxRadius, maxSize, 0f, 0f, 0f, 0.4f);
     }
 
-    private static VoxelShape shapeFor(ClientLevel level, Player player, BlockPos origin, BlockState state,
-                                       Predicate<BlockState> stateMatch, int maxRadius, int maxSize) {
+    private static VoxelShape getGroupShape(ClientLevel level, Player player, BlockPos origin, BlockState state,
+                                            Predicate<BlockState> stateMatch, int maxRadius, int maxSize) {
         long bucket = level.getGameTime() / 10; // refresh at most every 10 ticks
         if (!origin.equals(originCache) || bucket != bucketCache) {
             originCache = origin.immutable();
             bucketCache = bucket;
-            shapeCache = buildShape(level, player, origin, state, stateMatch, maxRadius, maxSize);
+            shapeCache = buildOutlineShape(level, player, origin, state, stateMatch, maxRadius, maxSize);
         }
         return shapeCache;
     }
 
-    private static VoxelShape buildShape(ClientLevel level, Player player, BlockPos origin, BlockState state,
-                                         Predicate<BlockState> stateMatch, int maxRadius, int maxSize) {
+    private static VoxelShape buildOutlineShape(ClientLevel level, Player player, BlockPos origin, BlockState state,
+                                                Predicate<BlockState> stateMatch, int maxRadius, int maxSize) {
         var found = SearchAlgorithms.BREADTH_FIRST_SEARCH.search(level, origin, stateMatch, maxRadius, maxSize);
         if (found.isEmpty()) return null;
 
@@ -74,8 +74,8 @@ public class BlockGroupHighlighter {
         return shape;
     }
 
-    private static void renderShape(PoseStack stack, VertexConsumer buffer, VoxelShape shape, double xOffset, double yOffset, double zOffset,
-                                    float red, float green, float blue, float opacity) {
+    private static void renderOutlineShape(PoseStack stack, VertexConsumer buffer, VoxelShape shape, double xOffset, double yOffset, double zOffset,
+                                           float red, float green, float blue, float opacity) {
         var pose = stack.last();
         shape.forAllEdges((x1, y1, z1, x2, y2, z2) -> {
             float nx = (float) (x2 - x1);

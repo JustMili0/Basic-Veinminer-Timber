@@ -14,7 +14,7 @@ public class Veinminer {
     public static final int MAX_VEIN_SIZE = 64;
 
     public static boolean canSeeVein(Player player, BlockState state) {
-        return !player.isCreative() && state.is(ConventionalBlockTags.ORES) && player.getMainHandItem().isCorrectToolForDrops(state);
+        return !player.isCreative() /*&& state.is(ConventionalBlockTags.ORES)*/ && player.getMainHandItem().isCorrectToolForDrops(state);
     }
 
     public static boolean canVeinmine(Player player, BlockState state) {
@@ -24,9 +24,10 @@ public class Veinminer {
     public static void onBlockBroken(ServerLevel level, ServerPlayer player, BlockState state, BlockPos pos, boolean wasBroken) {
         if (!wasBroken || !canVeinmine(player, state)) return;
 
+        // Mine ore vein
         var tool = player.getMainHandItem();
         for (var target : BlockBreaking.breadthFirstSearch(level, pos, TagUtil.match(state), MAX_RADIUS, MAX_VEIN_SIZE)) {
-            if (!BlockBreaking.canAfford(tool)) break;
+            if (!BlockBreaking.canAfford(tool)) break; // Stop if tool durability is <= 1
             BlockBreaking.block(level, player, tool, level.getBlockState(target), target, false);
         }
     }

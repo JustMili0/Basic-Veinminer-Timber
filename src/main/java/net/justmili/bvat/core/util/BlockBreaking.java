@@ -16,23 +16,25 @@ import java.util.function.Predicate;
 
 public class BlockBreaking {
 
+    // Only allow damaging for tools that are unbreakable or with durability higher than one
     public static boolean canAfford(ItemStack tool) {
         if (!tool.isDamageableItem()) return true;
         return tool.getMaxDamage() - tool.getDamageValue() > 1;
     }
 
     public static void block(ServerLevel level, ServerPlayer player, ItemStack tool, BlockState state, BlockPos pos, boolean spawnParticles) {
-        if (state.isAir() || state.getDestroySpeed(level, pos) < 0) return;
-        if (!player.hasCorrectToolForDrops(state)) return;
+        if (state.isAir() || state.getDestroySpeed(level, pos) < 0) return; // Don't break air or indestructible blocks
+        if (!player.hasCorrectToolForDrops(state)) return; // Don't break vein if incorrect tool for drops
 
+        // Drop resources, exp and spawn particles
         Block.dropResources(state, level, pos, level.getBlockEntity(pos), player, tool);
         state.spawnAfterBreak(level, pos, tool, true);
         if (spawnParticles) level.levelEvent(LevelEvent.PARTICLES_DESTROY_BLOCK, pos, Block.getId(state));
 
+        // Actually break the block and damage tool
         level.setBlock(pos, state.getFluidState().createLegacyBlock(), Block.UPDATE_ALL);
         level.gameEvent(GameEvent.BLOCK_DESTROY, pos, GameEvent.Context.of(player, state));
         tool.mineBlock(level, state, pos, player);
-
     }
 
     public static List<BlockPos> breadthFirstSearch(Level level, BlockPos origin, Predicate<BlockState> stateMatch, int maxRadius, int maxSize) {

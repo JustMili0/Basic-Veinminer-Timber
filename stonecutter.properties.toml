@@ -2,7 +2,7 @@
 mod.id = "bvat"
 mod.name = "Basic Veinminer & Timber"
 mod.group = "net.justmili.bvat"
-mod.version = "0.0.1a"
+mod.version = "1.0.0-beta.1"
 
 deps.fabric_loader = "0.19.5"
 loomx.loom_version = "1.18-SNAPSHOT"

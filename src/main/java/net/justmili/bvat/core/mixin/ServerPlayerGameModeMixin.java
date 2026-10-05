@@ -28,11 +28,13 @@ public class ServerPlayerGameModeMixin {
 
     @Inject(method = "destroyBlock", at = @At("HEAD"))
     private void vat$captureState(BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
+        // Get BlockState of the block player is breaking
         this.vat$stateBefore = this.level.getBlockState(pos);
     }
 
     @Inject(method = "destroyBlock", at = @At("RETURN"))
     private void vat$getDestroyBlock(BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
+        // Hook up event because Fabric API doesn't have a block breaking event
         BlockBreakEvent.BLOCK_BROKEN.invoker().onBlockBroken(this.level, this.player, this.vat$stateBefore, pos, cir.getReturnValueZ());
         this.vat$stateBefore = null;
     }

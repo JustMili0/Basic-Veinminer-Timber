@@ -1,0 +1,6 @@
+- Finish making javadocs and comments
+- Add leaves breaking for timber
+- Port to 1.21.11, 26.1.2, 26.2 and 26.3
+- Publish
+- Add to maven (also add last AS and SiB versions to maven)
+- Integrate into Millie's Server Additions

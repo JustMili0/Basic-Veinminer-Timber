@@ -11,6 +11,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
+/**
+ * Searches connected blocks using depth-first traversal.
+ * Blocks are searched by following each connected path before moving to the next.
+ */
 public class DepthFirstSearch implements SearchAlgorithm {
 
     @Override
@@ -28,7 +32,7 @@ public class DepthFirstSearch implements SearchAlgorithm {
 
             for (var n : withinClosed(current, 1)) {
                 if (found.size() >= maxSize) break;
-                if (!visited.add(n.asLong()) || !limit.isInside(n)) continue;
+                if (!visited.add(n.asLong()) || !limit.isInside(n)) continue; // Don't search the same block twice or go outside the search radius
                 if (!stateMatch.test(level.getBlockState(n))) continue;
 
                 var next = n.immutable();

@@ -9,6 +9,10 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.function.Predicate;
 
+/**
+ * Searches every block within a cube around the origin.
+ * Matching blocks are returned closest to the origin first.
+ */
 public class CubeSearch implements SearchAlgorithm {
 
     @Override
@@ -19,6 +23,7 @@ public class CubeSearch implements SearchAlgorithm {
             if (stateMatch.test(level.getBlockState(pos))) found.add(pos.immutable());
         }
 
+        // Sort by distance so the closest blocks are returned first
         found.sort(Comparator.comparingDouble(pos -> pos.distSqr(origin)));
         return found.size() > maxSize? new ArrayList<>(found.subList(0, maxSize)) : found;
     }
