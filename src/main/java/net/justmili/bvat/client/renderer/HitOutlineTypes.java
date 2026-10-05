@@ -6,7 +6,7 @@ import net.minecraft.client.renderer.RenderType;
 
 import java.util.OptionalDouble;
 
-public class BlockHighlightRenderTypes {
+public class HitOutlineTypes {
     public static final RenderType DEFAULT_LINE;
     public static final RenderType THICK_LINE;
     public static final double THICK_LINE_WIDTH = 4.0;

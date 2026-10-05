@@ -5,9 +5,10 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
-import net.justmili.bvat.core.util.BlockBreaking;
 import net.justmili.bvat.core.util.Maths;
+import net.justmili.bvat.core.util.search.SearchAlgorithms;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
@@ -20,9 +21,9 @@ import java.util.function.Predicate;
 
 @Environment(EnvType.CLIENT)
 public class BlockGroupHighlighter {
-    private static BlockPos cachedOrigin;
-    private static long cachedBucket;
-    private static VoxelShape cachedShape;
+    private static BlockPos originCache;
+    private static long bucketCache;
+    private static VoxelShape shapeCache;
 
     /**
      * Outlines every block connected to the targeted one that passes stateMatch.
@@ -31,29 +32,38 @@ public class BlockGroupHighlighter {
      * @return true to let vanilla draw its own outline, false to cancel it.
      */
     public static boolean render(WorldRenderContext context, WorldRenderContext.BlockOutlineContext outline, RenderType highlightType,
-                                 Player player, Predicate<BlockState> stateMatch, int maxRadius, int maxSize) {
+                                 Player player, Predicate<BlockState> stateMatch, int maxRadius, int maxSize, float red, float green, float blue, float opacity) {
         var level = context.world();
-        if (level == null || context.consumers() == null) return true;
+        var matrix = context.matrixStack();
+        var consumer = context.consumers();
+        if (level == null || matrix == null || consumer == null) return true;
 
         var shape = shapeFor(level, player, outline.blockPos(), outline.blockState(), stateMatch, maxRadius, maxSize);
         if (shape == null) return true; // single block, vanilla outline is fine
 
-        renderShape(context.matrixStack(), context.consumers().getBuffer(highlightType), shape, -outline.cameraX(), -outline.cameraY(), -outline.cameraZ());
+        renderShape(matrix, consumer.getBuffer(highlightType), shape, -outline.cameraX(), -outline.cameraY(), -outline.cameraZ(), red, green, blue, opacity);
         return false;
     }
 
-    private static VoxelShape shapeFor(ClientLevel level, Player player, BlockPos origin, BlockState state, Predicate<BlockState> stateMatch, int maxRadius, int maxSize) {
-        long bucket = level.getGameTime() / 10; // refresh at most every 10 ticks
-        if (!origin.equals(cachedOrigin) || bucket != cachedBucket) {
-            cachedOrigin = origin.immutable();
-            cachedBucket = bucket;
-            cachedShape = buildShape(level, player, origin, state, stateMatch, maxRadius, maxSize);
-        }
-        return cachedShape;
+    public static boolean render(WorldRenderContext context, WorldRenderContext.BlockOutlineContext outline, RenderType highlightType,
+                                 Player player, Predicate<BlockState> stateMatch, int maxRadius, int maxSize) {
+        return render(context, outline, highlightType, player, stateMatch, maxRadius, maxSize, 0f, 0f, 0f, 0.4f);
     }
 
-    private static VoxelShape buildShape(ClientLevel level, Player player, BlockPos origin, BlockState state, Predicate<BlockState> stateMatch, int maxRadius, int maxSize) {
-        var found = BlockBreaking.breadthFirstSearch(level, origin, stateMatch, maxRadius, maxSize);
+    private static VoxelShape shapeFor(ClientLevel level, Player player, BlockPos origin, BlockState state,
+                                       Predicate<BlockState> stateMatch, int maxRadius, int maxSize) {
+        long bucket = level.getGameTime() / 10; // refresh at most every 10 ticks
+        if (!origin.equals(originCache) || bucket != bucketCache) {
+            originCache = origin.immutable();
+            bucketCache = bucket;
+            shapeCache = buildShape(level, player, origin, state, stateMatch, maxRadius, maxSize);
+        }
+        return shapeCache;
+    }
+
+    private static VoxelShape buildShape(ClientLevel level, Player player, BlockPos origin, BlockState state,
+                                         Predicate<BlockState> stateMatch, int maxRadius, int maxSize) {
+        var found = SearchAlgorithms.BREADTH_FIRST_SEARCH.search(level, origin, stateMatch, maxRadius, maxSize);
         if (found.isEmpty()) return null;
 
         var collision = CollisionContext.of(player);
@@ -64,7 +74,8 @@ public class BlockGroupHighlighter {
         return shape;
     }
 
-    private static void renderShape(PoseStack stack, VertexConsumer buffer, VoxelShape shape, double xOffset, double yOffset, double zOffset) {
+    private static void renderShape(PoseStack stack, VertexConsumer buffer, VoxelShape shape, double xOffset, double yOffset, double zOffset,
+                                    float red, float green, float blue, float opacity) {
         var pose = stack.last();
         shape.forAllEdges((x1, y1, z1, x2, y2, z2) -> {
             float nx = (float) (x2 - x1);
@@ -75,8 +86,10 @@ public class BlockGroupHighlighter {
             ny /= length;
             nz /= length;
 
-            buffer.addVertex(pose, (float) (x1 + xOffset), (float) (y1 + yOffset), (float) (z1 + zOffset)).setColor(1f, 1f, 1f, 1f).setNormal(pose, nx, ny, nz);
-            buffer.addVertex(pose, (float) (x2 + xOffset), (float) (y2 + yOffset), (float) (z2 + zOffset)).setColor(1f, 1f, 1f, 1f).setNormal(pose, nx, ny, nz);
+            buffer.addVertex(pose, (float) (x1 + xOffset), (float) (y1 + yOffset), (float) (z1 + zOffset))
+                .setColor(red, green, blue, opacity).setNormal(pose, nx, ny, nz);
+            buffer.addVertex(pose, (float) (x2 + xOffset), (float) (y2 + yOffset), (float) (z2 + zOffset))
+                .setColor(red, green, blue, opacity).setNormal(pose, nx, ny, nz);
         });
     }
 }

@@ -22,7 +22,7 @@ public class Veinminer {
     }
 
     public static void onBlockBroken(ServerLevel level, ServerPlayer player, BlockState state, BlockPos pos, boolean wasBroken) {
-        if (!wasBroken || !canVeinmine(player, state) ) return;
+        if (!wasBroken || !canVeinmine(player, state)) return;
 
         var tool = player.getMainHandItem();
         for (var target : BlockBreaking.breadthFirstSearch(level, pos, TagUtil.match(state), MAX_RADIUS, MAX_VEIN_SIZE)) {

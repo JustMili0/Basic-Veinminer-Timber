@@ -1,4 +1,5 @@
 package net.justmili.bvat.core.util;
+
 public class Maths {
 
     public static double lengthSqrd(double x, double y, double z) {

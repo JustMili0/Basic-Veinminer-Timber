@@ -24,16 +24,16 @@ public class ServerPlayerGameModeMixin {
     protected ServerPlayer player;
 
     @Unique
-    private BlockState vat$stateBeforeBreak;
+    private BlockState vat$stateBefore;
 
     @Inject(method = "destroyBlock", at = @At("HEAD"))
     private void vat$captureState(BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
-        this.vat$stateBeforeBreak = this.level.getBlockState(pos);
+        this.vat$stateBefore = this.level.getBlockState(pos);
     }
 
     @Inject(method = "destroyBlock", at = @At("RETURN"))
     private void vat$getDestroyBlock(BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
-        BlockBreakEvent.BLOCK_BROKEN.invoker().onBlockBroken(this.level, this.player, this.vat$stateBeforeBreak, pos, cir.getReturnValueZ());
-        this.vat$stateBeforeBreak = null;
+        BlockBreakEvent.BLOCK_BROKEN.invoker().onBlockBroken(this.level, this.player, this.vat$stateBefore, pos, cir.getReturnValueZ());
+        this.vat$stateBefore = null;
     }
 }

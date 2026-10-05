@@ -11,6 +11,6 @@ public class VeinBlobHighlighter {
         var player = Minecraft.getInstance().player;
         if (player == null || !Veinminer.canSeeVein(player, outline.blockState())) return true;
 
-        return BlockGroupHighlighter.render(context, outline, BlockHighlightRenderTypes.THICK_LINE, player, TagUtil.match(outline.blockState()), Veinminer.MAX_RADIUS, Veinminer.MAX_VEIN_SIZE);
+        return BlockGroupHighlighter.render(context, outline, HitOutlineTypes.THICK_LINE, player, TagUtil.match(outline.blockState()), Veinminer.MAX_RADIUS, Veinminer.MAX_VEIN_SIZE, 1f, 1f, 1f, 1f);
     }
 }
