@@ -28,7 +28,7 @@ public class DepthFirstSearch implements SearchAlgorithm {
         var found = new ArrayList<BlockPos>();
         var visited = new LongOpenHashSet();
         var stack = new ArrayDeque<BlockPos>();
-        var limit = new BoundingBox(origin).inflatedBy(maxRadius);
+        var bounds = new BoundingBox(origin).inflatedBy(maxRadius);
 
         visited.add(origin.asLong());
         stack.push(origin);
@@ -36,12 +36,12 @@ public class DepthFirstSearch implements SearchAlgorithm {
         while (!stack.isEmpty() && found.size() < maxSize) {
             var current = stack.pop();
 
-            for (var n : withinClosed(current, 1)) {
+            for (var neighbor : withinClosed(current, 1)) {
                 if (found.size() >= maxSize) break;
-                if (!visited.add(n.asLong()) || !limit.isInside(n)) continue; // Don't search the same block twice or go outside the search radius
-                if (!stateMatch.test(level.getBlockState(n))) continue;
+                if (!visited.add(neighbor.asLong()) || !bounds.isInside(neighbor)) continue; // Don't search the same block twice or go outside the search radius
+                if (!stateMatch.test(level.getBlockState(neighbor))) continue;
 
-                var next = n.immutable();
+                var next = neighbor.immutable();
                 found.add(next);
                 stack.push(next);
             }

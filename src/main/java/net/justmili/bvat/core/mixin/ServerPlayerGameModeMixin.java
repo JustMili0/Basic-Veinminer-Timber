@@ -27,15 +27,15 @@ public class ServerPlayerGameModeMixin {
     @Unique
     private BlockState bvat$stateBefore;
 
-    // Get BlockState of the block player is breaking
+    // Save the BlockState before the block is destroyed, since afterwards it's gone
     @Inject(method = "destroyBlock", at = @At("HEAD"))
-    private void bvat$captureState(BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
+    private void bvat$captureStateBefore(BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
         this.bvat$stateBefore = this.level.getBlockState(pos);
     }
 
-    // Hook up event because Fabric API's event doesn't provide fully what I need
+    // Hook up own event for block breaking because Fabric API's event doesn't fully provide what I need
     @Inject(method = "destroyBlock", at = @At("RETURN"))
-    private void bvat$destroyBlockEvent(BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
+    private void bvat$blockBrokenEvent(BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
         BlockBreakEvent.BLOCK_BROKEN.invoker().onBlockBroken(this.level, this.player, this.bvat$stateBefore, pos, cir.getReturnValueZ());
         this.bvat$stateBefore = null;
     }

@@ -29,7 +29,7 @@ import java.util.function.Predicate;
 @Environment(EnvType.CLIENT)
 public class BlockGroupOutliner {
     private static BlockPos originCache;
-    private static long bucketCache;
+    private static long tickBucketCache;
     private static VoxelShape shapeCache;
 
     /**
@@ -44,30 +44,30 @@ public class BlockGroupOutliner {
     public static boolean render(WorldRenderContext context, WorldRenderContext.BlockOutlineContext outline, Player player,
                                  Predicate<BlockState> stateMatch, int maxRadius, int maxSize, float red, float green, float blue, float opacity) {
         var level = context.world();
-        var matrix = context.matrixStack();
-        var consumer = context.consumers();
-        if (level == null || matrix == null || consumer == null) return true;
+        var stack = context.matrixStack();
+        var buffers = context.consumers();
+        if (level == null || stack == null || buffers == null) return true;
 
         var shape = getCachedShape(level, player, outline.blockPos(), outline.blockState(), stateMatch, maxRadius, maxSize);
         if (shape == null) return true; // single block, vanilla outline is fine
 
-        renderOutlineShape(matrix, consumer.getBuffer(RenderType.lines()), shape, -outline.cameraX(), -outline.cameraY(), -outline.cameraZ(), red, green, blue, opacity);
+        renderOutlineShape(stack, buffers.getBuffer(RenderType.lines()), shape, -outline.cameraX(), -outline.cameraY(), -outline.cameraZ(), red, green, blue, opacity);
         return false;
     }
 
     public static boolean render(WorldRenderContext context, WorldRenderContext.BlockOutlineContext outline, Player player,
                                  Predicate<BlockState> stateMatch, int maxRadius, int maxSize) {
-        // Render with default outline color
+        // Render with default outline RGBA values
         return render(context, outline, player, stateMatch, maxRadius, maxSize, 0f, 0f, 0f, 0.4f);
     }
 
-    // Get and refresh cache of origin pos, bucket and group shape
+    // Get cached group shape, rebuild it every 10 ticks or if the targeted block changed
     private static VoxelShape getCachedShape(ClientLevel level, Player player, BlockPos origin, BlockState state,
                                              Predicate<BlockState> stateMatch, int maxRadius, int maxSize) {
-        long bucket = level.getGameTime() / 10; // refresh at most every 10 ticks
-        if (!origin.equals(originCache) || bucket != bucketCache) {
+        long tickBucket = level.getGameTime() / 10; // refresh at most every 10 ticks
+        if (!origin.equals(originCache) || tickBucket != tickBucketCache) {
             originCache = origin.immutable();
-            bucketCache = bucket;
+            tickBucketCache = tickBucket;
             shapeCache = buildOutlineShape(level, player, origin, state, stateMatch, maxRadius, maxSize);
         }
         return shapeCache;

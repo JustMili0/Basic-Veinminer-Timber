@@ -1,4 +1,6 @@
-- Prevent timber from making loud ass noise
+- Rework BlockGroupOutliner to render outlines with LevelRenderer.renderVoxelShape(...) instead of VoxelShape.forAllEdges(...)
+- Make the outlines be darker if player isn't crouching and same as current if they are crouching
+- Write the README/mod description and update changelog to match
 - Port to 1.21.11, 26.1.2, 26.2 and 26.3
 - Publish
 - Add to maven (also add last AS and SiB versions to maven)

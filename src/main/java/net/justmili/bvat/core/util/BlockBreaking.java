@@ -32,33 +32,34 @@ public class BlockBreaking {
      * to avoid recursion if called by destroyBlock event call.
      * This also means anything else hooked into destroyBlock (protection mods etc.) won't run for these blocks.
      *
-     * @param spawnParticles whether to play the break particles and sound
+     * @param playEffects whether to play the break particles and sound
      * @param damageTool whether the tool loses durability, the player still gets the "used" stat if not
      */
-    public static void destroy(ServerLevel level, ServerPlayer player, ItemStack tool, BlockState state, BlockPos pos, boolean spawnParticles, boolean damageTool) {
+    public static void destroy(ServerLevel level, ServerPlayer player, ItemStack tool, BlockState state, BlockPos pos, boolean playEffects, boolean damageTool) {
         if (state.isAir() || state.getDestroySpeed(level, pos) < 0) return;
         if (!player.hasCorrectToolForDrops(state)) return;
 
         Block.dropResources(state, level, pos, level.getBlockEntity(pos), player, tool);
         state.spawnAfterBreak(level, pos, tool, true);
-        if (spawnParticles) level.levelEvent(LevelEvent.PARTICLES_DESTROY_BLOCK, pos, Block.getId(state));
+        if (playEffects) level.levelEvent(LevelEvent.PARTICLES_DESTROY_BLOCK, pos, Block.getId(state));
 
         level.setBlock(pos, state.getFluidState().createLegacyBlock(), Block.UPDATE_ALL);
         if (damageTool) {
             tool.mineBlock(level, state, pos, player);
         } else {
-            // Still award player for breaking the block even if tool damaging is disabled
+            // Award stat for breaking even tho tool isn't used
             player.awardStat(Stats.ITEM_USED.get(tool.getItem()));
         }
         level.gameEvent(GameEvent.BLOCK_DESTROY, pos, GameEvent.Context.of(player, state));
         player.awardStat(Stats.BLOCK_MINED.get(state.getBlock()));
     }
 
-    public static void destroy(ServerLevel level, ServerPlayer player, ItemStack tool, BlockState state, BlockPos pos, boolean spawnParticles) {
-        BlockBreaking.destroy(level, player, tool, state, pos, spawnParticles, true);
+    public static void destroy(ServerLevel level, ServerPlayer player, ItemStack tool, BlockState state, BlockPos pos, boolean playEffects) {
+        BlockBreaking.destroy(level, player, tool, state, pos, playEffects, true);
     }
 
     /**
+     * Finds blocks connected to origin that pass stateMatch, closest first.
      * Origin is not in the result, so break it separately if needed.
      */
     public static List<BlockPos> breadthFirstSearch(Level level, BlockPos origin, Predicate<BlockState> stateMatch, int maxRadius, int maxSize) {

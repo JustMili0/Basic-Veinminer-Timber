@@ -6,7 +6,7 @@ import net.minecraft.client.Minecraft;
 
 public class TreeTrunkOutline {
 
-    // Render white outline around block group if block group is looked at by the player
+    // Render white outline around the whole tree trunk when the player looks at a log with an axe in hand
     public static boolean onBlockOutline(WorldRenderContext context, WorldRenderContext.BlockOutlineContext outline) {
         var player = Minecraft.getInstance().player;
         if (player == null || !Timber.canSeeTree(player, outline.blockState())) return true;

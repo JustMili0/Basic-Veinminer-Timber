@@ -34,7 +34,7 @@ public class SpreadSearch implements SearchAlgorithm {
         var visited = new LongOpenHashSet();
         var queue = new ArrayDeque<BlockPos>();
 
-        // Count each pos of origins as visited so flood never walks back into them
+        // Mark every origin as visited so the spread never walks back into them
         for (var pos : origins) {
             visited.add(pos.asLong());
             queue.add(pos);
@@ -42,14 +42,14 @@ public class SpreadSearch implements SearchAlgorithm {
 
         while (!queue.isEmpty() && found.size() < maxSize) {
             var current = queue.poll();
-            var state = level.getBlockState(current);
+            var currentState = level.getBlockState(current);
 
             for (var direction : Direction.values()) {
                 if (found.size() >= maxSize) break;
 
                 var next = current.relative(direction);
                 if (!visited.add(next.asLong())) continue;
-                if (!canSpread.test(state, level.getBlockState(next))) continue;
+                if (!canSpread.test(currentState, level.getBlockState(next))) continue;
 
                 found.add(next);
                 queue.add(next);
