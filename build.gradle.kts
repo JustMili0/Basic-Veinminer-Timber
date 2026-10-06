@@ -30,6 +30,7 @@ repositories {
     }
     strictMaven("https://www.cursemaven.com", "CurseForge", "curse.maven")
     strictMaven("https://api.modrinth.com/maven", "Modrinth", "maven.modrinth")
+    maven("https://maven.terraformersmc.com/") // Mod Menu
 }
 
 dependencies {
@@ -46,16 +47,17 @@ dependencies {
     loomx.applyMojangMappings()
 
     // Use `mod{dependency type}` even on 26.1+ - loom-back-compat converts them
-    modImplementation("net.fabricmc.fabric-api:fabric-api:${property("deps.fabric_api")}")
     modImplementation("net.fabricmc:fabric-loader:${property("deps.fabric_loader")}")
-    fapi("fabric-lifecycle-events-v1", "fabric-resource-loader-v0", "fabric-content-registries-v0", "fabric-registry-sync-v0")
+    modImplementation("net.fabricmc.fabric-api:fabric-api:${property("deps.fabric_api")}")
+
+    modImplementation("com.terraformersmc:modmenu:${property("deps.mod_menu")}")
 }
 
 loom {
     fabricModJsonPath = rootProject.file("src/main/resources/fabric.mod.json") // Useful for interface injection
     accessWidenerPath = sc.process(
-        rootProject.file("src/main/resources/bvat.ct"),
-        "build/processed.ct"
+        rootProject.file("src/main/resources/bvat.accesswidener"),
+        "build/processed.accesswidener"
     )
 
     decompilerOptions.named("vineflower") {

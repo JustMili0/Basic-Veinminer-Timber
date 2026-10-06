@@ -3,14 +3,14 @@
   "id": "${id}",
   "version": "${version}",
   "name": "${name}",
-  "description": "A really basic veinminer and timber in one",
+  "description": "A really basic 2-in-1 veinminer amd timber",
   "authors": ["JustMili"],
   "contact": {
-    "homepage": "",
-    "sources": "",
-    "issues": ""
+    "homepage": "https://modrinth.com/mod/basic-veinminer-and-timber",
+    "sources": "https://github.com/JustMili0/Basic-Veinminer-Timber",
+    "issues": "https://github.com/JustMili0/Basic-Veinminer-Timber/issues"
   },
-  "license": "All Rights Reserved",
+  "license": "MIT",
   "icon": "icon.png",
   "environment": "*",
   "entrypoints": {
@@ -24,9 +24,19 @@
   "mixins": [
     "bvat.mixins.json"
   ],
-  "accessWidener": "bvat.ct",
+  "accessWidener": "bvat.accesswidener",
   "depends": {
     "fabricloader": ">=${loader}",
     "minecraft": "${minecraft}"
+  },
+  "custom": {
+    "modmenu": {
+      "links": {
+        "modmenu.modrinth": "https://modrinth.com/mod/basic-veinminer-and-timber",
+        "modmenu.discord": "https://discord.gg/DPEw9DU2vT",
+        "modmenu.kofi": "https://ko-fi.com/justmilivt",
+        "modmenu.twitter": "https://x.com/JustMiliVT"
+      }
+    }
   }
 }
