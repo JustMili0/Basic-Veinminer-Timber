@@ -11,6 +11,6 @@ public class TreeTrunkOutline {
         var player = Minecraft.getInstance().player;
         if (player == null || !Timber.canSeeTree(player, outline.blockState())) return true;
         float rgb = OutlineShade.get(player);
-        return BlockGroupOutliner.render(context, outline, player, Timber::isLog, Timber.MAX_RADIUS, Timber.MAX_TRUNK, rgb, rgb, rgb, 0.6f, true);
+        return BlockGroupOutliner.render(context, outline, player, Timber::isLog, Timber.MAX_RADIUS, Timber.MAX_TRUNK, 0.6f, rgb, rgb, rgb, true);
     }
 }

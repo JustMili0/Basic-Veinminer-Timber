@@ -17,8 +17,4 @@ public class BVaT implements ModInitializer {
         LOGGER.info("Initializing {} ({}) version {}", NAME, ID, BUILD);
         EventRegistry.init();
     }
-
-    public static ResourceLocation asId(String path) {
-        return ResourceLocation.fromNamespaceAndPath(ID, path);
-    }
 }
