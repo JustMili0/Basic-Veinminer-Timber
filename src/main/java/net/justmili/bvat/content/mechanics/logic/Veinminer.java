@@ -11,24 +11,24 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class Veinminer {
     public static final int MAX_RADIUS = 16;
-    public static final int MAX_VEIN_SIZE = 64;
+    public static final int MAX_VEIN = 64;
 
     public static boolean canSeeVein(Player player, BlockState state) {
-        return !player.isCreative() /*&& state.is(ConventionalBlockTags.ORES)*/ && player.getMainHandItem().isCorrectToolForDrops(state);
+        return !player.isCreative() && state.is(ConventionalBlockTags.ORES) && player.getMainHandItem().isCorrectToolForDrops(state);
     }
 
-    public static boolean canVeinmine(Player player, BlockState state) {
+    public static boolean canMineVein(Player player, BlockState state) {
         return canSeeVein(player, state) && player.isShiftKeyDown();
     }
 
-    public static void onBlockBroken(ServerLevel level, ServerPlayer player, BlockState state, BlockPos pos, boolean wasBroken) {
-        if (!wasBroken || !canVeinmine(player, state)) return;
+    public static void mineOreVein(ServerLevel level, ServerPlayer player, BlockState state, BlockPos pos, boolean wasBroken) {
+        if (!wasBroken || !canMineVein(player, state)) return;
 
         // Mine ore vein
         var tool = player.getMainHandItem();
-        for (var target : BlockBreaking.breadthFirstSearch(level, pos, TagUtil.match(state), MAX_RADIUS, MAX_VEIN_SIZE)) {
+        for (var target : BlockBreaking.breadthFirstSearch(level, pos, TagUtil.match(state), MAX_RADIUS, MAX_VEIN)) {
             if (!BlockBreaking.canAfford(tool)) break; // Stop if tool durability is <= 1
-            BlockBreaking.block(level, player, tool, level.getBlockState(target), target, false);
+            BlockBreaking.destroy(level, player, tool, level.getBlockState(target), target, true);
         }
     }
 }

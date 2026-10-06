@@ -15,6 +15,7 @@
   - Sneak to chop down
   - Requires any item under `minecraft:axes` item tag to chop down
   - Chopped down logs are affected by the tool's enchantments
+  - Also breaks the leaves
   - Block breaking will stop if your tool is at 1 durability left
   - On the client, the vein's edges will be visibly highlighted
 

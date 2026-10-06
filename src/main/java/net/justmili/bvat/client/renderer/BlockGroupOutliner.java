@@ -19,7 +19,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import java.util.function.Predicate;
 
 @Environment(EnvType.CLIENT)
-public class BlockGroupHighlighter {
+public class BlockGroupOutliner {
     private static BlockPos originCache;
     private static long bucketCache;
     private static VoxelShape shapeCache;

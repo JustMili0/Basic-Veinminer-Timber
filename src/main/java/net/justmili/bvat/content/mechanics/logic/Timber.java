@@ -15,51 +15,62 @@ import java.util.List;
 
 public class Timber {
     public static final int MAX_RADIUS = 32;
-    public static final int MAX_TREE_SIZE = 256;
+    public static final int MAX_TRUNK = 256;
+    public static final int MAX_LEAVES = 256;
 
-    // Check if player can see a tree with probable intent to chop it down
     public static boolean canSeeTree(Player player, BlockState state) {
         return !player.isCreative() && isLog(state) && player.getMainHandItem().is(ItemTags.AXES);
     }
 
-    // Check if player can chop down a tree (can see + is crouching)
     public static boolean canChopDown(Player player, BlockState state) {
         return canSeeTree(player, state) && player.isShiftKeyDown();
     }
 
-    public static void onBlockBroken(ServerLevel level, ServerPlayer player, BlockState state, BlockPos pos, boolean wasBroken) {
+    public static void chopDownTree(ServerLevel level, ServerPlayer player, BlockState state, BlockPos pos, boolean wasBroken) {
         if (!wasBroken || !canChopDown(player, state)) return;
 
-        // Get logs connected to origin and see if it is a natural tree
-        var logs = BlockBreaking.breadthFirstSearch(level, pos, Timber::isLog, MAX_RADIUS, MAX_TREE_SIZE);
+        var logs = BlockBreaking.breadthFirstSearch(level, pos, Timber::isLog, MAX_RADIUS, MAX_TRUNK);
         if (!isTree(level, pos, logs)) return;
+        var leaves = BlockBreaking.spreadSearch(level, pos, logs);
 
-        // Break tree trunk
+        // Break tree trunk and leaves, don't damage tool for leaves
         var tool = player.getMainHandItem();
-        for (var target : logs) {
+        for (var log : logs) {
             if (!BlockBreaking.canAfford(tool)) break; // Stop if tool durability is <= 1
-            BlockBreaking.block(level, player, tool, level.getBlockState(target), target, false);
+            BlockBreaking.destroy(level, player, tool, level.getBlockState(log), log, false);
         }
-        // TODO: Add leaf breaking
+        for (var leaf : leaves) {
+            BlockBreaking.destroy(level, player, tool, level.getBlockState(leaf), leaf, true, false);
+        }
+    }
+
+    public static boolean isTree(Level level, BlockPos origin, List<BlockPos> logs) {
+        if (isNaturalLeafConnected(level, origin)) return true;
+        for (var log : logs) {
+            if (isNaturalLeafConnected(level, log)) return true;
+        }
+        return false;
+    }
+
+    private static boolean isNaturalLeafConnected(Level level, BlockPos center) {
+        for (var pos : BlockPos.betweenClosed(center.offset(-1, -1, -1), center.offset(1, 1, 1))) {
+            var state = level.getBlockState(pos);
+            if (isLeaf(state)) return true;
+        }
+        return false;
+    }
+
+    public static boolean isLeafInRange(BlockState from, BlockState to) {
+        if (!isLeaf(to)) return false;
+        if (!from.hasProperty(LeavesBlock.DISTANCE) || !to.hasProperty(LeavesBlock.DISTANCE)) return true;
+        return to.getValue(LeavesBlock.DISTANCE) > from.getValue(LeavesBlock.DISTANCE);
     }
 
     public static boolean isLog(BlockState state) {
         return state.is(BlockTags.LOGS);
     }
 
-    // Check if any logs have natural (non-persistent) leaves attached to them
-    public static boolean isTree(Level level, BlockPos origin, List<BlockPos> logs) {
-        if (isNaturalLeafConnected(level, origin)) return true;
-        for (var log : logs) if (isNaturalLeafConnected(level, log)) return true;
-        return false;
-    }
-
-    // Check for natural (non-persistent) leaves
-    private static boolean isNaturalLeafConnected(Level level, BlockPos center) {
-        for (var pos : BlockPos.betweenClosed(center.offset(-1, -1, -1), center.offset(1, 1, 1))) {
-            var state = level.getBlockState(pos);
-            if (state.is(BlockTags.LEAVES) && state.hasProperty(LeavesBlock.PERSISTENT) && !state.getValue(LeavesBlock.PERSISTENT)) return true;
-        }
-        return false;
+    public static boolean isLeaf(BlockState state) {
+        return (state.is(BlockTags.LEAVES) && state.hasProperty(LeavesBlock.PERSISTENT) && !state.getValue(LeavesBlock.PERSISTENT)) || state.is(BlockTags.WART_BLOCKS);
     }
 }

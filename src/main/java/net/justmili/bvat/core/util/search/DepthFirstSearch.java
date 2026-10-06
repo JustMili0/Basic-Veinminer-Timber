@@ -8,7 +8,9 @@ import net.minecraft.world.level.levelgen.structure.BoundingBox;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
 /**
@@ -40,7 +42,11 @@ public class DepthFirstSearch implements SearchAlgorithm {
                 stack.push(next);
             }
         }
-
         return found;
+    }
+
+    @Override
+    public List<BlockPos> biSearch(Level level, Collection<BlockPos> origins, BiPredicate<BlockState, BlockState> canSpread, int maxSize) {
+        return List.of();
     }
 }

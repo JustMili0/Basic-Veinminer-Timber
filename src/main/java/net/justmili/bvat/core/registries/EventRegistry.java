@@ -7,7 +7,7 @@ import net.justmili.bvat.core.api.BlockBreakEvent;
 public class EventRegistry {
 
     public static void init() {
-        BlockBreakEvent.BLOCK_BROKEN.register(Veinminer::onBlockBroken);
-        BlockBreakEvent.BLOCK_BROKEN.register(Timber::onBlockBroken);
+        BlockBreakEvent.BLOCK_BROKEN.register(Veinminer::mineOreVein);
+        BlockBreakEvent.BLOCK_BROKEN.register(Timber::chopDownTree);
     }
 }

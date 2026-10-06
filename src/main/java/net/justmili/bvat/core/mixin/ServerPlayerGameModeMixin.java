@@ -19,23 +19,24 @@ public class ServerPlayerGameModeMixin {
 
     @Shadow
     protected ServerLevel level;
+
     @Shadow
     @Final
     protected ServerPlayer player;
 
     @Unique
-    private BlockState vat$stateBefore;
+    private BlockState bvat$stateBefore;
 
+    // Get BlockState of the block player is breaking
     @Inject(method = "destroyBlock", at = @At("HEAD"))
-    private void vat$captureState(BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
-        // Get BlockState of the block player is breaking
-        this.vat$stateBefore = this.level.getBlockState(pos);
+    private void bvat$captureState(BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
+        this.bvat$stateBefore = this.level.getBlockState(pos);
     }
 
+    // Hook up event because Fabric API doesn't have a block breaking event
     @Inject(method = "destroyBlock", at = @At("RETURN"))
-    private void vat$getDestroyBlock(BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
-        // Hook up event because Fabric API doesn't have a block breaking event
-        BlockBreakEvent.BLOCK_BROKEN.invoker().onBlockBroken(this.level, this.player, this.vat$stateBefore, pos, cir.getReturnValueZ());
-        this.vat$stateBefore = null;
+    private void bvat$getDestroyBlock(BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
+        BlockBreakEvent.BLOCK_BROKEN.invoker().onBlockBroken(this.level, this.player, this.bvat$stateBefore, pos, cir.getReturnValueZ());
+        this.bvat$stateBefore = null;
     }
 }

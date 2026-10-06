@@ -4,10 +4,11 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
-@FunctionalInterface
 public interface SearchAlgorithm {
 
     /**
@@ -18,4 +19,6 @@ public interface SearchAlgorithm {
     }
 
     List<BlockPos> search(Level level, BlockPos origin, Predicate<BlockState> stateMatch, int maxRadius, int maxSize);
+
+    List<BlockPos> biSearch(Level level, Collection<BlockPos> origins, BiPredicate<BlockState, BlockState> canSpread, int maxSize);
 }
