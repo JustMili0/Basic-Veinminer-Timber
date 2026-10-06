@@ -11,6 +11,7 @@ public class VeinBlobOutline {
     public static boolean onBlockOutline(WorldRenderContext context, WorldRenderContext.BlockOutlineContext outline) {
         var player = Minecraft.getInstance().player;
         if (player == null || !Veinminer.canSeeVein(player, outline.blockState())) return true;
-        return BlockGroupOutliner.render(context, outline, player, TagUtil.matchOre(outline.blockState()), Veinminer.MAX_RADIUS, Veinminer.MAX_VEIN, 1f, 1f, 1f, 0.6f);
+        float rgb = OutlineShade.get(player);
+        return BlockGroupOutliner.render(context, outline, player, TagUtil.matchOre(outline.blockState()), Veinminer.MAX_RADIUS, Veinminer.MAX_VEIN, rgb, rgb, rgb, 0.6f, true);
     }
 }

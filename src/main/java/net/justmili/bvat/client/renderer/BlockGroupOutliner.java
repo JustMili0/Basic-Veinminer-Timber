@@ -8,6 +8,7 @@ import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.justmili.bvat.core.util.Maths;
 import net.justmili.bvat.core.util.search.SearchAlgorithms;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
@@ -41,8 +42,8 @@ public class BlockGroupOutliner {
      *
      * @return true to let vanilla draw its own outline, false to cancel it.
      */
-    public static boolean render(WorldRenderContext context, WorldRenderContext.BlockOutlineContext outline, Player player,
-                                 Predicate<BlockState> stateMatch, int maxRadius, int maxSize, float red, float green, float blue, float opacity) {
+    public static boolean render(WorldRenderContext context, WorldRenderContext.BlockOutlineContext outline, Player player, Predicate<BlockState> stateMatch,
+                                 int maxRadius, int maxSize, float red, float green, float blue, float opacity, boolean renderVanillaOutline) {
         var level = context.world();
         var stack = context.matrixStack();
         var buffers = context.consumers();
@@ -52,13 +53,13 @@ public class BlockGroupOutliner {
         if (shape == null) return true; // single block, vanilla outline is fine
 
         renderOutlineShape(stack, buffers.getBuffer(RenderType.lines()), shape, -outline.cameraX(), -outline.cameraY(), -outline.cameraZ(), red, green, blue, opacity);
-        return false;
+        return renderVanillaOutline;
     }
 
-    public static boolean render(WorldRenderContext context, WorldRenderContext.BlockOutlineContext outline, Player player,
-                                 Predicate<BlockState> stateMatch, int maxRadius, int maxSize) {
+    public static boolean render(WorldRenderContext context, WorldRenderContext.BlockOutlineContext outline, Player player, Predicate<BlockState> stateMatch,
+                                 int maxRadius, int maxSize, boolean renderVanillaOutline) {
         // Render with default outline RGBA values
-        return render(context, outline, player, stateMatch, maxRadius, maxSize, 0f, 0f, 0f, 0.4f);
+        return render(context, outline, player, stateMatch, maxRadius, maxSize, 0f, 0f, 0f, 0.4f, renderVanillaOutline);
     }
 
     // Get cached group shape, rebuild it every 10 ticks or if the targeted block changed
@@ -90,20 +91,6 @@ public class BlockGroupOutliner {
     // Draw group outlines
     private static void renderOutlineShape(PoseStack stack, VertexConsumer buffer, VoxelShape shape, double xOffset, double yOffset, double zOffset,
                                            float red, float green, float blue, float opacity) {
-        var pose = stack.last();
-        shape.forAllEdges((x1, y1, z1, x2, y2, z2) -> {
-            float nx = (float) (x2 - x1);
-            float ny = (float) (y2 - y1);
-            float nz = (float) (z2 - z1);
-            float length = (float) Maths.length(nx, ny, nz);
-            nx /= length;
-            ny /= length;
-            nz /= length;
-
-            buffer.addVertex(pose, (float) (x1 + xOffset), (float) (y1 + yOffset), (float) (z1 + zOffset))
-                .setColor(red, green, blue, opacity).setNormal(pose, nx, ny, nz);
-            buffer.addVertex(pose, (float) (x2 + xOffset), (float) (y2 + yOffset), (float) (z2 + zOffset))
-                .setColor(red, green, blue, opacity).setNormal(pose, nx, ny, nz);
-        });
+        LevelRenderer.renderShape(stack, buffer, shape, xOffset, yOffset, zOffset, red, green, blue, opacity);
     }
 }
