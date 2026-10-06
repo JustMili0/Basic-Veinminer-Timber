@@ -1,8 +1,12 @@
 package net.justmili.bvat.content.mechanics.logic;
 
+// Class prepared for later 1.1 update that will add a config
 public enum DropPlacements {
-    WHERE_BROKEN,
-    ORIGIN_POS,
-    PLAYER_POS,
-    PLAYER_INV
+    WHERE_BROKEN("default"), // Default for veinminer and timber
+    ORIGIN_POS("origin"),
+    PLAYER_POS("player"),
+    PLAYER_INV("inventory"); // For timber also add a bool INCLUDE_LEAVES_DROPS for player inv drop placement
+
+    DropPlacements(String type) {
+    }
 }

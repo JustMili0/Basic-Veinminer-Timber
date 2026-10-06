@@ -10,4 +10,8 @@ public class Maths {
     public static double length(double x, double y, double z) {
         return Math.sqrt(lengthSqrd(x, y, z));
     }
+
+    public static int clamp(int value, int min, int max) {
+        return Math.min(Math.max(value, min), max);
+    }
 }

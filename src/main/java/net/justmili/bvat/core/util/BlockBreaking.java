@@ -1,6 +1,5 @@
 package net.justmili.bvat.core.util;
 
-import net.justmili.bvat.content.mechanics.logic.Timber;
 import net.justmili.bvat.core.util.search.SearchAlgorithms;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -13,7 +12,6 @@ import net.minecraft.world.level.block.LevelEvent;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -65,15 +63,5 @@ public class BlockBreaking {
      */
     public static List<BlockPos> breadthFirstSearch(Level level, BlockPos origin, Predicate<BlockState> stateMatch, int maxRadius, int maxSize) {
         return SearchAlgorithms.BREADTH_FIRST_SEARCH.search(level, origin, stateMatch, maxRadius, maxSize);
-    }
-
-    /**
-     * Finds the leaves of a tree, spreading out from the logs and origin.
-     * Only returns the leaves, not the logs.
-     */
-    public static List<BlockPos> spreadSearch(Level level, BlockPos origin, List<BlockPos> blocks) {
-        var column = new ArrayList<>(blocks);
-        column.add(origin);
-        return SearchAlgorithms.SPREAD_SEARCH.biSearch(level, column, Timber::isLeafInRange, Timber.MAX_LEAVES);
     }
 }

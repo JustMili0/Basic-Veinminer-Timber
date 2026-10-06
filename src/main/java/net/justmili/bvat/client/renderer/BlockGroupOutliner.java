@@ -48,7 +48,7 @@ public class BlockGroupOutliner {
         var consumer = context.consumers();
         if (level == null || matrix == null || consumer == null) return true;
 
-        var shape = cacheShape(level, player, outline.blockPos(), outline.blockState(), stateMatch, maxRadius, maxSize);
+        var shape = getCachedShape(level, player, outline.blockPos(), outline.blockState(), stateMatch, maxRadius, maxSize);
         if (shape == null) return true; // single block, vanilla outline is fine
 
         renderOutlineShape(matrix, consumer.getBuffer(RenderType.lines()), shape, -outline.cameraX(), -outline.cameraY(), -outline.cameraZ(), red, green, blue, opacity);
@@ -61,9 +61,9 @@ public class BlockGroupOutliner {
         return render(context, outline, player, stateMatch, maxRadius, maxSize, 0f, 0f, 0f, 0.4f);
     }
 
-    // Cache origin pos, bucket and group shape
-    private static VoxelShape cacheShape(ClientLevel level, Player player, BlockPos origin, BlockState state,
-                                         Predicate<BlockState> stateMatch, int maxRadius, int maxSize) {
+    // Get and refresh cache of origin pos, bucket and group shape
+    private static VoxelShape getCachedShape(ClientLevel level, Player player, BlockPos origin, BlockState state,
+                                             Predicate<BlockState> stateMatch, int maxRadius, int maxSize) {
         long bucket = level.getGameTime() / 10; // refresh at most every 10 ticks
         if (!origin.equals(originCache) || bucket != bucketCache) {
             originCache = origin.immutable();

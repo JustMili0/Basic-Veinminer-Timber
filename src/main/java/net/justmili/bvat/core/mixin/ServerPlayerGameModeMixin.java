@@ -33,9 +33,9 @@ public class ServerPlayerGameModeMixin {
         this.bvat$stateBefore = this.level.getBlockState(pos);
     }
 
-    // Hook up event because Fabric API doesn't have a block breaking event
+    // Hook up event because Fabric API's event doesn't provide fully what I need
     @Inject(method = "destroyBlock", at = @At("RETURN"))
-    private void bvat$getDestroyBlock(BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
+    private void bvat$destroyBlockEvent(BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
         BlockBreakEvent.BLOCK_BROKEN.invoker().onBlockBroken(this.level, this.player, this.bvat$stateBefore, pos, cir.getReturnValueZ());
         this.bvat$stateBefore = null;
     }

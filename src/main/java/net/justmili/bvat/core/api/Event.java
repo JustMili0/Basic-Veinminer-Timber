@@ -3,6 +3,7 @@ package net.justmili.bvat.core.api;
 import java.lang.reflect.Array;
 import java.util.function.Function;
 
+// Base event creation class from Millie's Core Libraries. Temporary until I switch this to actually make this use the library
 @SuppressWarnings("unchecked")
 public final class Event<T> {
     private final Class<T> type;

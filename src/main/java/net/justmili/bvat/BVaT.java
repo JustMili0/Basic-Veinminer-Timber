@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 public class BVaT implements ModInitializer {
     public static final String ID = "bvat";
     public static final String NAME = "Basic Veinminer & Timber";
-    public static final String BUILD = "0.0.1a";
+    public static final String BUILD = "1.0.0";
     public static final Logger LOGGER = LoggerFactory.getLogger(NAME);
 
     @Override
