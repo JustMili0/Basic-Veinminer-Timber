@@ -17,12 +17,8 @@ public class Veinminer {
         return !player.isCreative() && state.is(ConventionalBlockTags.ORES) && player.getMainHandItem().isCorrectToolForDrops(state);
     }
 
-    public static boolean canMineVein(Player player, BlockState state) {
-        return canSeeVein(player, state) && player.isShiftKeyDown();
-    }
-
     public static void mineOreVein(ServerLevel level, ServerPlayer player, BlockState state, BlockPos pos, boolean wasBroken) {
-        if (!wasBroken || !canMineVein(player, state)) return;
+        if (!wasBroken || !(canSeeVein(player, state) && player.isShiftKeyDown())) return;
 
         // Mine ore vein
         var tool = player.getMainHandItem();

@@ -20,18 +20,14 @@ import java.util.List;
 public class Timber {
     public static final int MAX_RADIUS = 32;
     public static final int MAX_TRUNK = 256;
-    public static final int MAX_LEAVES = (int) (MAX_TRUNK * 1.5f);
+    public static final int MAX_LEAVES = 256;
 
     public static boolean canSeeTree(Player player, BlockState state) {
         return !player.isCreative() && isLog(state) && player.getMainHandItem().is(ItemTags.AXES);
     }
 
-    public static boolean canChopDown(Player player, BlockState state) {
-        return canSeeTree(player, state) && player.isShiftKeyDown();
-    }
-
     public static void chopDownTree(ServerLevel level, ServerPlayer player, BlockState state, BlockPos pos, boolean wasBroken) {
-        if (!wasBroken || !canChopDown(player, state)) return;
+        if (!wasBroken || !(canSeeTree(player, state) && player.isShiftKeyDown())) return;
 
         var logs = BlockBreaking.breadthFirstSearch(level, pos, Timber::isLog, MAX_RADIUS, MAX_TRUNK);
         if (!isTree(level, pos, logs)) return;

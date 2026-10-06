@@ -1,4 +1,4 @@
-package net.justmili.bvat.content.mechanics.logic;
+package net.justmili.bvat.config;
 
 // Enum prepared for later 1.1 update that will add a config
 public enum DropPlacements {
