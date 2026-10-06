@@ -1,4 +1,3 @@
-- Redo javadocs, comments and function names and params
 - Prevent timber from making loud ass noise
 - Port to 1.21.11, 26.1.2, 26.2 and 26.3
 - Publish

@@ -18,6 +18,14 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 
 import java.util.function.Predicate;
 
+/**
+ * Outlines a whole group of connected blocks instead of just the one the player is looking at.
+ * Does not outline every single block individually in group, only the group as a whole.
+ * Call {@link #render} from the block outline event and return what it gives back.
+ * <p>
+ * The group is cached and refreshed every 10 ticks. The cache only looks at the targeted block, not stateMatch,
+ * so two outliners on the same block would end up sharing a shape.
+ */
 @Environment(EnvType.CLIENT)
 public class BlockGroupOutliner {
     private static BlockPos originCache;
@@ -27,6 +35,9 @@ public class BlockGroupOutliner {
     /**
      * Outlines every block connected to the targeted one that passes stateMatch.
      * Callers decide if it should show at all, this only draws.
+     * <p>
+     * maxRadius and maxSize are passed to the search, color and opacity go from 0 to 1.
+     * If the targeted block is on its own there's nothing to group, so vanilla's outline is left alone.
      *
      * @return true to let vanilla draw its own outline, false to cancel it.
      */
@@ -37,7 +48,7 @@ public class BlockGroupOutliner {
         var consumer = context.consumers();
         if (level == null || matrix == null || consumer == null) return true;
 
-        var shape = getGroupShape(level, player, outline.blockPos(), outline.blockState(), stateMatch, maxRadius, maxSize);
+        var shape = cacheShape(level, player, outline.blockPos(), outline.blockState(), stateMatch, maxRadius, maxSize);
         if (shape == null) return true; // single block, vanilla outline is fine
 
         renderOutlineShape(matrix, consumer.getBuffer(RenderType.lines()), shape, -outline.cameraX(), -outline.cameraY(), -outline.cameraZ(), red, green, blue, opacity);
@@ -50,8 +61,9 @@ public class BlockGroupOutliner {
         return render(context, outline, player, stateMatch, maxRadius, maxSize, 0f, 0f, 0f, 0.4f);
     }
 
-    private static VoxelShape getGroupShape(ClientLevel level, Player player, BlockPos origin, BlockState state,
-                                            Predicate<BlockState> stateMatch, int maxRadius, int maxSize) {
+    // Cache origin pos, bucket and group shape
+    private static VoxelShape cacheShape(ClientLevel level, Player player, BlockPos origin, BlockState state,
+                                         Predicate<BlockState> stateMatch, int maxRadius, int maxSize) {
         long bucket = level.getGameTime() / 10; // refresh at most every 10 ticks
         if (!origin.equals(originCache) || bucket != bucketCache) {
             originCache = origin.immutable();
@@ -61,6 +73,7 @@ public class BlockGroupOutliner {
         return shapeCache;
     }
 
+    // Get shape of block group
     private static VoxelShape buildOutlineShape(ClientLevel level, Player player, BlockPos origin, BlockState state,
                                                 Predicate<BlockState> stateMatch, int maxRadius, int maxSize) {
         var found = SearchAlgorithms.BREADTH_FIRST_SEARCH.search(level, origin, stateMatch, maxRadius, maxSize);
@@ -74,6 +87,7 @@ public class BlockGroupOutliner {
         return shape;
     }
 
+    // Draw group outlines
     private static void renderOutlineShape(PoseStack stack, VertexConsumer buffer, VoxelShape shape, double xOffset, double yOffset, double zOffset,
                                            float red, float green, float blue, float opacity) {
         var pose = stack.last();

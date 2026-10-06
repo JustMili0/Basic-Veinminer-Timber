@@ -14,6 +14,9 @@ import java.util.function.Predicate;
 /**
  * Searches every block within a cube around the origin.
  * Matching blocks are returned closest to the origin first.
+ * <p>
+ * Blocks don't have to be connected, and origin IS included in the result if it matches.
+ * Every block in the cube gets checked, so keep the radius small as block count grows cubically.
  */
 public class CubeSearch implements SearchAlgorithm {
 

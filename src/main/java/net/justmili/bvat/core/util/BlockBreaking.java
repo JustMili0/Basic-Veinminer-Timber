@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
+// Helpers for breaking blocks as a player and finding which blocks to break, for things like veinminer and timber.
 public class BlockBreaking {
 
     public static boolean canAfford(ItemStack tool) {
@@ -25,9 +26,16 @@ public class BlockBreaking {
     }
 
     /**
+     * Breaks a block as the player, with drops, stats and optionally tool damage.
+     * Does nothing for air, unbreakable blocks (bedrock) or if the player's held item isn't the correct tool for it.
+     * <p>
      * Using {@code Block.dropResources(state, level, pos, level.getBlockEntity(pos), player, tool)} and
      * {@code state.spawnAfterBreak(level, pos, tool, true)} instead of {@code player.gameMode.destroyBlock(pos)}
-     * to avoid recursion in destroyBlock event call
+     * to avoid recursion if called by destroyBlock event call.
+     * This also means anything else hooked into destroyBlock (protection mods etc.) won't run for these blocks.
+     *
+     * @param spawnParticles whether to play the break particles and sound
+     * @param damageTool whether the tool loses durability, the player still gets the "used" stat if not
      */
     public static void destroy(ServerLevel level, ServerPlayer player, ItemStack tool, BlockState state, BlockPos pos, boolean spawnParticles, boolean damageTool) {
         if (state.isAir() || state.getDestroySpeed(level, pos) < 0) return;
@@ -52,10 +60,17 @@ public class BlockBreaking {
         BlockBreaking.destroy(level, player, tool, state, pos, spawnParticles, true);
     }
 
+    /**
+     * Origin is not in the result, so break it separately if needed.
+     */
     public static List<BlockPos> breadthFirstSearch(Level level, BlockPos origin, Predicate<BlockState> stateMatch, int maxRadius, int maxSize) {
         return SearchAlgorithms.BREADTH_FIRST_SEARCH.search(level, origin, stateMatch, maxRadius, maxSize);
     }
 
+    /**
+     * Finds the leaves of a tree, spreading out from the logs and origin.
+     * Only returns the leaves, not the logs.
+     */
     public static List<BlockPos> spreadSearch(Level level, BlockPos origin, List<BlockPos> blocks) {
         var column = new ArrayList<>(blocks);
         column.add(origin);

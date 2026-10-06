@@ -13,7 +13,14 @@ import java.util.List;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
-
+/**
+ * Spreads out from the origins one block at a time, through the 6 faces (no diagonals).
+ * A BiPredicate decides if it can go from one block to the next, so the answer can depend on both blocks
+ * (e.g. leaves only spreading further away from the logs).
+ * <p>
+ * No radius, only the predicate and maxSize stop it. Origins are not included in the result.
+ * Only supports {@link #biSearch}.
+ */
 public class SpreadSearch implements SearchAlgorithm {
 
     @Override
@@ -51,6 +58,9 @@ public class SpreadSearch implements SearchAlgorithm {
         return found;
     }
 
+    /**
+     * Same as above but with a single origin. Not on {@link SearchAlgorithm}, so it can't be used through {@link SearchAlgorithms}.
+     */
     public List<BlockPos> biSearch(Level level, BlockPos origin, BiPredicate<BlockState, BlockState> canSpread, int maxSize) {
         return biSearch(level, List.of(origin), canSpread, maxSize);
     }

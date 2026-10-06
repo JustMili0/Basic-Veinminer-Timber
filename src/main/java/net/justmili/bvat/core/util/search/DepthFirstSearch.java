@@ -16,6 +16,10 @@ import java.util.function.Predicate;
 /**
  * Searches connected blocks using depth-first traversal.
  * Blocks are searched by following each connected path before moving to the next.
+ * <p>
+ * Diagonals count as connected and origin is not included in the result.
+ * Results are not sorted by distance, so if the group is bigger than maxSize use {@link BreadthFirstSearch}
+ * to get the closest blocks.
  */
 public class DepthFirstSearch implements SearchAlgorithm {
 

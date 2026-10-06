@@ -12,7 +12,10 @@ import java.util.function.Predicate;
 
 /**
  * Searches connected blocks using breadth-first traversal.
- * Blocks are searched starting from the origin and expanding outwards.
+ * Blocks are searched starting from the origin and expanding outwards, so the closest ones come first.
+ * <p>
+ * Diagonals count as connected and origin is not included in the result.
+ * Radius is counted in steps through the group, not straight line distance.
  */
 public class BreadthFirstSearch implements SearchAlgorithm {
 
