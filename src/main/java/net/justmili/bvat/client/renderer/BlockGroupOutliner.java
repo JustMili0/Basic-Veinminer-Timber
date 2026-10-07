@@ -4,16 +4,23 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+//? if >= 26.1 {
+import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderContext;
+import net.minecraft.client.renderer.state.level.BlockOutlineRenderState;
+//?} else if >= 1.21.11 {
+/*import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;
+import net.minecraft.client.renderer.state.BlockOutlineRenderState;
+*///?} else {
+/*import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
+ *///?}
 //? if >= 1.21.11 {
-import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;
 import net.minecraft.util.ARGB;
 import net.minecraft.client.renderer.ShapeRenderer;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
-import net.minecraft.client.renderer.state.BlockOutlineRenderState;
 //?} else {
-/*import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
-import net.minecraft.client.renderer.LevelRenderer;
+/*import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.world.phys.Vec3;
 *///?}
 import net.justmili.bvat.core.util.client.GameUtil;
 import net.justmili.bvat.core.util.search.SearchAlgorithms;
@@ -50,34 +57,25 @@ public class BlockGroupOutliner {
      *
      * @return true to let vanilla draw its own outline, false to cancel it.
      */
-    public static boolean render(WorldRenderContext context, /*? if >= 1.21.11 {*/BlockOutlineRenderState/*?} else {*//*WorldRenderContext.BlockOutlineContext*//*?}*/ outline, Player player, Predicate<BlockState> stateMatch,
+    public static boolean render(/*? if >= 26.1 {*/LevelRenderContext/*?} else {*//*WorldRenderContext*//*?}*/ context, /*? if >= 1.21.11 {*/BlockOutlineRenderState/*?} else {*//*WorldRenderContext.BlockOutlineContext*//*?}*/ outline, Player player, Predicate<BlockState> stateMatch,
                                  int maxRadius, int maxSize, float a, float r, float g, float b, boolean renderVanillaOutline) {
         var level = GameUtil.level();
-        var stack = context./*? if >= 1.21.11 {*/matrices()/*?} else {*//*matrixStack()*//*?}*/;
-        var buffers = context.consumers();
+        var stack = context./*? if >= 26.1 {*/poseStack()/*?} else if >= 1.21.11 {*//*matrices()*//*?} else {*//*matrixStack()*//*?}*/;
+        var buffers = context./*? if >= 26.1 {*/bufferSource()/*?} else {*//*consumers()*//*?}*/;
         if (level == null/*? if < 1.21.11 {*/ /*|| stack == null || buffers == null*//*?}*/) return true;
 
         var pos = outline./*? if >= 1.21.11 {*/pos()/*?} else {*//*blockPos()*//*?}*/;
         var shape = getCachedShape(level, player, pos, level.getBlockState(pos), stateMatch, maxRadius, maxSize);
         if (shape == null) return true; // single block, vanilla outline is fine
 
-        //? if >= 1.21.11 {
-        var camera = context.worldState().cameraRenderState.pos;
-        var x = camera.x;
-        var y = camera.y;
-        var z = camera.z;
-        //?} else {
-        /*var x = outline.cameraX();
-        var y = outline.cameraY();
-        var z = outline.cameraZ();
-        *///?}
+        var camera = /*? if >= 26.1 {*/context.levelState().cameraRenderState.pos/*?} else if >= 1.21.11 {*//*context.worldState().cameraRenderState.pos*//*?} else {*//*new Vec3(outline.cameraX(), outline.cameraY(), outline.cameraZ())*//*?}*/;
 
         var buffer = buffers.getBuffer(/*? if >= 1.21.11 {*/RenderTypes/*?} else {*//*RenderType*//*?}*/.lines());
-        renderOutlineShape(stack, buffer, shape, -x, -y, -z, a, r, g, b);
+        renderOutlineShape(stack, buffer, shape, -camera.x, -camera.y, -camera.z, a, r, g, b);
         return renderVanillaOutline;
     }
 
-    public static boolean render(WorldRenderContext context, /*? if >= 1.21.11 {*/BlockOutlineRenderState/*?} else {*//*WorldRenderContext.BlockOutlineContext*//*?}*/ outline, Player player, Predicate<BlockState> stateMatch,
+    public static boolean render(/*? if >= 26.1 {*/LevelRenderContext/*?} else {*//*WorldRenderContext*//*?}*/ context, /*? if >= 1.21.11 {*/BlockOutlineRenderState/*?} else {*//*WorldRenderContext.BlockOutlineContext*//*?}*/ outline, Player player, Predicate<BlockState> stateMatch,
                                  int maxRadius, int maxSize, boolean renderVanillaOutline) {
         // Render with default outline ARGB values
         return render(context, outline, player, stateMatch, maxRadius, maxSize, 0.4f, 0f, 0f, 0f, renderVanillaOutline);

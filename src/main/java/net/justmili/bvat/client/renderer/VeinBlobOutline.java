@@ -1,9 +1,12 @@
 package net.justmili.bvat.client.renderer;
 
-//? if >= 1.21.11 {
-import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;
+//? if >= 26.1 {
+import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderContext;
+import net.minecraft.client.renderer.state.level.BlockOutlineRenderState;
+//?} else if >= 1.21.11 {
+/*import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;
 import net.minecraft.client.renderer.state.BlockOutlineRenderState;
-//?} else {
+*///?} else {
 /*import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
  *///?}
 import net.justmili.bvat.content.mechanics.logic.Veinminer;
@@ -14,7 +17,7 @@ import net.justmili.bvat.core.util.client.OutlineShade;
 public class VeinBlobOutline {
 
     // Render white outline around the whole ore vein when the player looks at it with a pickaxe in hand
-    public static boolean onBlockOutline(WorldRenderContext context, /*? if >= 1.21.11 {*/BlockOutlineRenderState/*?} else {*//*WorldRenderContext.BlockOutlineContext*//*?}*/ outline) {
+    public static boolean onBlockOutline(/*? if >= 26.1 {*/LevelRenderContext/*?} else {*//*WorldRenderContext*//*?}*/ context, /*? if >= 1.21.11 {*/BlockOutlineRenderState/*?} else {*//*WorldRenderContext.BlockOutlineContext*//*?}*/ outline) {
         var player = GameUtil.player();
         var level = GameUtil.level();
         if (player == null || level == null) return true;
