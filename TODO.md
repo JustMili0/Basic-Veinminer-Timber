@@ -1,3 +1,4 @@
+- Make it so Timber only lights up if the trunk is touching natural leaves
 - Port to 1.21.11, 26.1.2, 26.2 and 26.3
 - Publish
 - Add to maven (also add last AS and SiB versions to maven)

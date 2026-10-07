@@ -2,7 +2,6 @@ package net.justmili.bvat;
 
 import net.fabricmc.api.ModInitializer;
 import net.justmili.bvat.core.registries.EventRegistry;
-import net.minecraft.resources.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

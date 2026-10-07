@@ -9,7 +9,7 @@ public class TagUtil {
 
     // This will have proper documentation in Core Libs, not here
     public static Predicate<BlockState> matchOre(BlockState state) {
-        var tags = state./*? if >= 26.1 {*/tags()/*?} else {*//*getTags()*//*?}*/.filter(tag -> tag.location().getNamespace().equals("c") && tag.location().getPath().startsWith("ores/")).toList();
+        var tags = state./*? if >= 26.1 {*//*tags()*//*?} else {*/getTags()/*?}*/.filter(tag -> tag.location().getNamespace().equals("c") && tag.location().getPath().startsWith("ores/")).toList();
         if (tags.isEmpty()) return s -> s.is(state.getBlock());
         return s -> tags.stream().anyMatch(s::is);
     }

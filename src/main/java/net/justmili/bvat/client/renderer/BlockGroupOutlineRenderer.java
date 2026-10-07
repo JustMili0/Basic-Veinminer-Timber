@@ -1,27 +1,7 @@
 package net.justmili.bvat.client.renderer;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-//? if >= 26.1 {
-import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderContext;
-import net.minecraft.client.renderer.state.level.BlockOutlineRenderState;
-//?} else if >= 1.21.11 {
-/*import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;
-import net.minecraft.client.renderer.state.BlockOutlineRenderState;
-*///?} else {
-/*import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
- *///?}
-//? if >= 1.21.11 {
-import net.minecraft.util.ARGB;
-import net.minecraft.client.renderer.ShapeRenderer;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
-//?} else {
-/*import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.world.phys.Vec3;
-*///?}
 import net.justmili.bvat.core.util.client.GameUtil;
 import net.justmili.bvat.core.util.search.SearchAlgorithms;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -34,6 +14,29 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 
 import java.util.function.Predicate;
 
+//? if < 26.2 {
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+//?}
+//? if >= 26.1 {
+//?} else if >= 1.21.11 {
+/*import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;
+import net.minecraft.client.renderer.state.BlockOutlineRenderState;
+*///?} else {
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
+ //?}
+//? if >= 1.21.11 {
+/*import net.minecraft.util.ARGB;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
+*///?} else {
+import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.world.phys.Vec3;
+//?}
+//? if >= 1.21.11 && < 26.2 {
+/*import net.minecraft.client.renderer.ShapeRenderer;
+ *///?}
+
 /**
  * Outlines a whole group of connected blocks instead of just the one the player is looking at.
  * Does not outline every single block individually in group, only the group as a whole.
@@ -43,7 +46,7 @@ import java.util.function.Predicate;
  * so two outliners on the same block would end up sharing a shape.
  */
 @Environment(EnvType.CLIENT)
-public class BlockGroupOutliner {
+public class BlockGroupOutlineRenderer {
     private static BlockPos originCache;
     private static long tickBucketCache;
     private static VoxelShape shapeCache;
@@ -57,28 +60,45 @@ public class BlockGroupOutliner {
      *
      * @return true to let vanilla draw its own outline, false to cancel it.
      */
-    public static boolean render(/*? if >= 26.1 {*/LevelRenderContext/*?} else {*//*WorldRenderContext*//*?}*/ context, /*? if >= 1.21.11 {*/BlockOutlineRenderState/*?} else {*//*WorldRenderContext.BlockOutlineContext*//*?}*/ outline, Player player, Predicate<BlockState> stateMatch,
-                                 int maxRadius, int maxSize, float a, float r, float g, float b, boolean renderVanillaOutline) {
+    public static boolean render(BlockGroupOutlineContext group, Player player, Predicate<BlockState> stateMatch, int maxRadius, int maxSize,
+                                 float a, float r, float g, float b, boolean renderVanillaOutline) {
+        var ctx = group.context();
+        var lines = group.outline();
         var level = GameUtil.level();
-        var stack = context./*? if >= 26.1 {*/poseStack()/*?} else if >= 1.21.11 {*//*matrices()*//*?} else {*//*matrixStack()*//*?}*/;
-        var buffers = context./*? if >= 26.1 {*/bufferSource()/*?} else {*//*consumers()*//*?}*/;
-        if (level == null/*? if < 1.21.11 {*/ /*|| stack == null || buffers == null*//*?}*/) return true;
+        var stack = group.poseStack();
+        //? if >= 26.2 {
+        /*var collector = ctx.submitNodeCollector();
+        *///?} else if >= 26.1 {
+        /*var buffers = ctx.bufferSource();
+        *///?} else {
+        var buffers = ctx.consumers();
+        //?}
+        if (level == null/*? if < 1.21.11 {*/|| stack == null || buffers == null/*?}*/) return true;
 
-        var pos = outline./*? if >= 1.21.11 {*/pos()/*?} else {*//*blockPos()*//*?}*/;
+        var pos = lines./*? if >= 1.21.11 {*//*pos()*//*?} else {*/blockPos()/*?}*/;
         var shape = getCachedShape(level, player, pos, level.getBlockState(pos), stateMatch, maxRadius, maxSize);
         if (shape == null) return true; // single block, vanilla outline is fine
 
-        var camera = /*? if >= 26.1 {*/context.levelState().cameraRenderState.pos/*?} else if >= 1.21.11 {*//*context.worldState().cameraRenderState.pos*//*?} else {*//*new Vec3(outline.cameraX(), outline.cameraY(), outline.cameraZ())*//*?}*/;
+        var camera = group.cameraPos();
 
-        var buffer = buffers.getBuffer(/*? if >= 1.21.11 {*/RenderTypes/*?} else {*//*RenderType*//*?}*/.lines());
+        //? if >= 26.2 {
+        /*stack.pushPose();
+        stack.translate(-camera.x, -camera.y, -camera.z);
+        collector.submitShapeOutline(stack, shape, RenderTypes.lines(), ARGB.colorFromFloat(a, r, g, b), GameUtil.window().getAppropriateLineWidth(), false);
+        stack.popPose();
+        *///?} else if >= 1.21.11 {
+        /*var buffer = buffers.getBuffer(RenderTypes.lines());
         renderOutlineShape(stack, buffer, shape, -camera.x, -camera.y, -camera.z, a, r, g, b);
+        *///?} else {
+        var buffer = buffers.getBuffer(RenderType.lines());
+        renderOutlineShape(stack, buffer, shape, -camera.x, -camera.y, -camera.z, a, r, g, b);
+        //?}
         return renderVanillaOutline;
     }
 
-    public static boolean render(/*? if >= 26.1 {*/LevelRenderContext/*?} else {*//*WorldRenderContext*//*?}*/ context, /*? if >= 1.21.11 {*/BlockOutlineRenderState/*?} else {*//*WorldRenderContext.BlockOutlineContext*//*?}*/ outline, Player player, Predicate<BlockState> stateMatch,
-                                 int maxRadius, int maxSize, boolean renderVanillaOutline) {
+    public static boolean render(BlockGroupOutlineContext group, Player player, Predicate<BlockState> stateMatch, int maxRadius, int maxSize, boolean renderVanillaOutline) {
         // Render with default outline ARGB values
-        return render(context, outline, player, stateMatch, maxRadius, maxSize, 0.4f, 0f, 0f, 0f, renderVanillaOutline);
+        return render(group, player, stateMatch, maxRadius, maxSize, 0.4f, 0f, 0f, 0f, renderVanillaOutline);
     }
 
     // Get cached group shape, rebuild it every 10 ticks or if the targeted block changed
@@ -94,8 +114,7 @@ public class BlockGroupOutliner {
     }
 
     // Get shape of block group
-    private static VoxelShape buildOutlineShape(ClientLevel level, Player player, BlockPos origin, BlockState state, Predicate<BlockState> stateMatch,
-                                                int maxRadius, int maxSize) {
+    private static VoxelShape buildOutlineShape(ClientLevel level, Player player, BlockPos origin, BlockState state, Predicate<BlockState> stateMatch, int maxRadius, int maxSize) {
         var found = SearchAlgorithms.BREADTH_FIRST_SEARCH.search(level, origin, stateMatch, maxRadius, maxSize);
         if (found.isEmpty()) return null;
 
@@ -107,13 +126,14 @@ public class BlockGroupOutliner {
         return shape;
     }
 
-    // Draw group outlines
-    private static void renderOutlineShape(PoseStack stack, VertexConsumer buffer, VoxelShape shape, double xOffset, double yOffset, double zOffset,
-                                           float a, float r, float g, float b) {
-        //? if >= 1.21.11 {
+    // Draw group outlines (pre-26.2 only, 26.2+ submits straight from render)
+    //? if >= 1.21.11 && < 26.2 {
+    /*private static void renderOutlineShape(PoseStack stack, VertexConsumer buffer, VoxelShape shape, double xOffset, double yOffset, double zOffset, float a, float r, float g, float b) {
         ShapeRenderer.renderShape(stack, buffer, shape, xOffset, yOffset, zOffset, ARGB.colorFromFloat(a, r, g, b), GameUtil.window().getAppropriateLineWidth());
-        //?} else {
-        /*LevelRenderer.renderShape(stack, buffer, shape, xOffset, yOffset, zOffset, r, g, b, a);
-         *///?}
     }
+    *///?} else if < 1.21.11 {
+    private static void renderOutlineShape(PoseStack stack, VertexConsumer buffer, VoxelShape shape, double xOffset, double yOffset, double zOffset, float a, float r, float g, float b) {
+        LevelRenderer.renderShape(stack, buffer, shape, xOffset, yOffset, zOffset, r, g, b, a);
+    }
+    //?}
 }

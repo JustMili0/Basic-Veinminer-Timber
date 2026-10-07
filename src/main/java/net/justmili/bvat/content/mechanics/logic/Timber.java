@@ -67,13 +67,13 @@ public class Timber {
         return state.is(BlockTags.LOGS);
     }
 
-    public static List<BlockPos> getConnectedLeaves(Level level, BlockPos origin, List<BlockPos> logs, int maxSize) {
+    private static List<BlockPos> getConnectedLeaves(Level level, BlockPos origin, List<BlockPos> logs, int maxSize) {
         var origins = new ArrayList<>(logs);
         origins.add(origin);
         return SearchAlgorithms.SPREAD_SEARCH.biSearch(level, origins, Timber::canSpread, maxSize);
     }
 
-    public static boolean canSpread(BlockState from, BlockState to) {
+    private static boolean canSpread(BlockState from, BlockState to) {
         if (!isNaturalLeaf(to)) return false;
         if (!from.hasProperty(LeavesBlock.DISTANCE) || !to.hasProperty(LeavesBlock.DISTANCE)) return true;
         return to.getValue(LeavesBlock.DISTANCE) > from.getValue(LeavesBlock.DISTANCE);
@@ -88,7 +88,7 @@ public class Timber {
     }
 
     // Include wart blocks to natural leaves because nether trees
-    public static boolean isNaturalLeaf(BlockState state) {
+    private static boolean isNaturalLeaf(BlockState state) {
         return (state.is(BlockTags.LEAVES) && state.hasProperty(LeavesBlock.PERSISTENT) && !state.getValue(LeavesBlock.PERSISTENT)) || state.is(BlockTags.WART_BLOCKS);
     }
 }
