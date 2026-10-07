@@ -27,10 +27,17 @@ public class BreadthFirstSearch implements SearchAlgorithm {
         BlockPos.breadthFirstTraversal(origin, maxRadius, maxSize + 1, (current, queue) -> {
             for (var next : withinClosed(current, 1)) queue.accept(next.immutable());
         }, current -> {
-            if (current.equals(origin)) return true;
+            //? if =1.21.1 {
+            /*if (current.equals(origin)) return true;
             if (!stateMatch.test(level.getBlockState(current))) return false;
             found.add(current);
             return true;
+            *///?} else if >=1.21.11 {
+            if (current.equals(origin)) return BlockPos.TraversalNodeStatus.ACCEPT;
+            if (!stateMatch.test(level.getBlockState(current))) return BlockPos.TraversalNodeStatus.SKIP;
+            found.add(current);
+            return BlockPos.TraversalNodeStatus.ACCEPT;
+            //?}
         });
         return found;
     }

@@ -1,4 +1,4 @@
-package net.justmili.bvat.client.renderer;
+package net.justmili.bvat.core.util.client;
 
 import net.minecraft.world.entity.player.Player;
 
