@@ -4,18 +4,18 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-//? if = 1.21.1 {
-/*import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
-import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.RenderType;
-*///?} else if >= 1.21.11 {
+//? if >= 1.21.11 {
 import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;
-import net.justmili.bvat.core.util.client.GameUtil;
 import net.minecraft.util.ARGB;
 import net.minecraft.client.renderer.ShapeRenderer;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.BlockOutlineRenderState;
-//?}
+//?} else {
+/*import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
+import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.client.renderer.RenderType;
+*///?}
+import net.justmili.bvat.core.util.client.GameUtil;
 import net.justmili.bvat.core.util.search.SearchAlgorithms;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
@@ -50,52 +50,35 @@ public class BlockGroupOutliner {
      *
      * @return true to let vanilla draw its own outline, false to cancel it.
      */
-
-    //? if = 1.21.1 {
-    /*public static boolean render(WorldRenderContext context, WorldRenderContext.BlockOutlineContext outline, Player player, Predicate<BlockState> stateMatch,
+    public static boolean render(WorldRenderContext context, /*? if >= 1.21.11 {*/BlockOutlineRenderState/*?} else {*//*WorldRenderContext.BlockOutlineContext*//*?}*/ outline, Player player, Predicate<BlockState> stateMatch,
                                  int maxRadius, int maxSize, float a, float r, float g, float b, boolean renderVanillaOutline) {
-        *///?} else if >= 1.21.11 {
-    public static boolean render(WorldRenderContext context, BlockOutlineRenderState outline, Player player, Predicate<BlockState> stateMatch,
-                                 int maxRadius, int maxSize, float a, float r, float g, float b, boolean renderVanillaOutline) {
-        //?}
-        //? if =1.21.1 {
-        /*var level = context.world();
-        var stack = context.matrixStack();
-        *///?} else if >=1.21.11 {
         var level = GameUtil.level();
-        var stack = context.matrices();
-        //?}
+        var stack = context./*? if >= 1.21.11 {*/matrices()/*?} else {*//*matrixStack()*//*?}*/;
         var buffers = context.consumers();
-        //? if =1.21.1 {
-        /*if (level == null || stack == null || buffers == null) return true;
-         *///?} else if >=1.21.11 {
-        var camera = context.worldState().cameraRenderState.pos;
-        if (level == null) return true;
-        //?}
+        if (level == null/*? if < 1.21.11 {*/ /*|| stack == null || buffers == null*//*?}*/) return true;
 
-        //? if =1.21.1 {
-        /*var shape = getCachedShape(level, player, outline.blockPos(), outline.blockState(), stateMatch, maxRadius, maxSize);
-        *///?} else if >=1.21.11 {
-        var pos = outline.pos();
+        var pos = outline./*? if >= 1.21.11 {*/pos()/*?} else {*//*blockPos()*//*?}*/;
         var shape = getCachedShape(level, player, pos, level.getBlockState(pos), stateMatch, maxRadius, maxSize);
-        //?}
         if (shape == null) return true; // single block, vanilla outline is fine
 
-        //? if = 1.21.1 {
-        /*renderOutlineShape(stack, buffers.getBuffer(RenderType.lines()), shape, -outline.cameraX(), -outline.cameraY(), -outline.cameraZ(), a, r, g, b);
-        *///?} else if >= 1.21.11 {
-        renderOutlineShape(stack, buffers.getBuffer(RenderTypes.lines()), shape, -camera.x, -camera.y, -camera.z, a, r, g, b);
-        //?}
+        //? if >= 1.21.11 {
+        var camera = context.worldState().cameraRenderState.pos;
+        var x = camera.x;
+        var y = camera.y;
+        var z = camera.z;
+        //?} else {
+        /*var x = outline.cameraX();
+        var y = outline.cameraY();
+        var z = outline.cameraZ();
+        *///?}
+
+        var buffer = buffers.getBuffer(/*? if >= 1.21.11 {*/RenderTypes/*?} else {*//*RenderType*//*?}*/.lines());
+        renderOutlineShape(stack, buffer, shape, -x, -y, -z, a, r, g, b);
         return renderVanillaOutline;
     }
 
-    //? if = 1.21.1 {
-    /*public static boolean render(WorldRenderContext context, WorldRenderContext.BlockOutlineContext outline, Player player, Predicate<BlockState> stateMatch,
+    public static boolean render(WorldRenderContext context, /*? if >= 1.21.11 {*/BlockOutlineRenderState/*?} else {*//*WorldRenderContext.BlockOutlineContext*//*?}*/ outline, Player player, Predicate<BlockState> stateMatch,
                                  int maxRadius, int maxSize, boolean renderVanillaOutline) {
-    *///?} else if >= 1.21.11 {
-    public static boolean render(WorldRenderContext context, BlockOutlineRenderState outline, Player player, Predicate<BlockState> stateMatch,
-                                 int maxRadius, int maxSize, boolean renderVanillaOutline) {
-        //?}
         // Render with default outline ARGB values
         return render(context, outline, player, stateMatch, maxRadius, maxSize, 0.4f, 0f, 0f, 0f, renderVanillaOutline);
     }
@@ -129,10 +112,10 @@ public class BlockGroupOutliner {
     // Draw group outlines
     private static void renderOutlineShape(PoseStack stack, VertexConsumer buffer, VoxelShape shape, double xOffset, double yOffset, double zOffset,
                                            float a, float r, float g, float b) {
-        //? if = 1.21.1 {
-        /*LevelRenderer.renderShape(stack, buffer, shape, xOffset, yOffset, zOffset, r, g, b, a);
-        *///?} else if >= 1.21.11 {
+        //? if >= 1.21.11 {
         ShapeRenderer.renderShape(stack, buffer, shape, xOffset, yOffset, zOffset, ARGB.colorFromFloat(a, r, g, b), GameUtil.window().getAppropriateLineWidth());
-        //?}
+        //?} else {
+        /*LevelRenderer.renderShape(stack, buffer, shape, xOffset, yOffset, zOffset, r, g, b, a);
+         *///?}
     }
 }

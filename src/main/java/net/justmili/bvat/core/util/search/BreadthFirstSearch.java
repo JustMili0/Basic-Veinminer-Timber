@@ -23,21 +23,22 @@ public class BreadthFirstSearch implements SearchAlgorithm {
     public List<BlockPos> search(Level level, BlockPos origin, Predicate<BlockState> stateMatch, int maxRadius, int maxSize) {
         var found = new ArrayList<BlockPos>();
 
+        //? if >= 1.21.11 {
+        var accept = BlockPos.TraversalNodeStatus.ACCEPT;
+        var skip = BlockPos.TraversalNodeStatus.SKIP;
+        //?} else {
+        /*var accept = true;
+        var skip = false;
+        *///?}
+
         // Include origin in traversal so the search can expand from it
         BlockPos.breadthFirstTraversal(origin, maxRadius, maxSize + 1, (current, queue) -> {
             for (var next : withinClosed(current, 1)) queue.accept(next.immutable());
         }, current -> {
-            //? if =1.21.1 {
-            /*if (current.equals(origin)) return true;
-            if (!stateMatch.test(level.getBlockState(current))) return false;
+            if (current.equals(origin)) return accept;
+            if (!stateMatch.test(level.getBlockState(current))) return skip;
             found.add(current);
-            return true;
-            *///?} else if >=1.21.11 {
-            if (current.equals(origin)) return BlockPos.TraversalNodeStatus.ACCEPT;
-            if (!stateMatch.test(level.getBlockState(current))) return BlockPos.TraversalNodeStatus.SKIP;
-            found.add(current);
-            return BlockPos.TraversalNodeStatus.ACCEPT;
-            //?}
+            return accept;
         });
         return found;
     }
