@@ -1,16 +1,33 @@
 package net.justmili.bvat.core.util;
 
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 
+import java.util.ArrayList;
 import java.util.function.Predicate;
 
-// Stripped down tag util from Millie's Core Libraries. Temporary until I switch this to actually make this use the library
 public class TagUtil {
 
-    // This will have proper documentation in Core Libs, not here
-    public static Predicate<BlockState> matchOre(BlockState state) {
-        var tags = state./*? if >= 26.1 {*//*tags()*//*?} else {*/getTags()/*?}*/.filter(tag -> tag.location().getNamespace().equals("c") && tag.location().getPath().startsWith("ores/")).toList();
-        if (tags.isEmpty()) return s -> s.is(state.getBlock());
-        return s -> tags.stream().anyMatch(s::is);
+    public static Predicate<BlockState> matchBlockTags(BlockState state, String namespace, String containsPath) {
+        var matchingTags = new ArrayList<TagKey<Block>>();
+        var tagIterator = state.getTags().iterator();
+        while (tagIterator.hasNext()) {
+            var tag = tagIterator.next();
+            var tagId = tag.location();
+            if (tagId.getNamespace().equals(namespace) && tagId.getPath().startsWith(containsPath)) matchingTags.add(tag);
+        }
+
+        if (matchingTags.isEmpty()) return s -> s.is(state.getBlock());
+        return s -> {
+            for (var tag : matchingTags) {
+                if (s.is(tag)) return true;
+            }
+            return false;
+        };
+    }
+
+    public static Predicate<BlockState> matchOreTags(BlockState state) {
+        return matchBlockTags(state, "c", "ores/");
     }
 }
