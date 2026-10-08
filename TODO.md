@@ -1,5 +1,5 @@
-- Make it so Timber only lights up if the trunk is touching natural leaves
-- Port to 1.21.11, 26.1.2, 26.2 and 26.3
+- Port 26.3
 - Publish
 - Add to maven (also add last AS and SiB versions to maven)
+- Make a quick NeoForge port for 1.21.1 and 26.1.2 (Or ask Blue to make one cuz he's fast)
 - Integrate into Millie's Server Additions

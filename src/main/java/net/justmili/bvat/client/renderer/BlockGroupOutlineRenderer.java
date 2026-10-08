@@ -20,22 +20,22 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 //?}
 //? if >= 26.1 {
 //?} else if >= 1.21.11 {
-/*import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;
+import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;
 import net.minecraft.client.renderer.state.BlockOutlineRenderState;
-*///?} else {
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
- //?}
+//?} else {
+/*import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
+*///?}
 //? if >= 1.21.11 {
-/*import net.minecraft.util.ARGB;
+import net.minecraft.util.ARGB;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
-*///?} else {
-import net.minecraft.client.renderer.LevelRenderer;
+//?} else {
+/*import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.world.phys.Vec3;
-//?}
+*///?}
 //? if >= 1.21.11 && < 26.2 {
-/*import net.minecraft.client.renderer.ShapeRenderer;
- *///?}
+import net.minecraft.client.renderer.ShapeRenderer;
+ //?}
 
 /**
  * Outlines a whole group of connected blocks instead of just the one the player is looking at.
@@ -62,20 +62,16 @@ public class BlockGroupOutlineRenderer {
      */
     public static boolean render(BlockGroupOutlineContext group, Player player, Predicate<BlockState> stateMatch, int maxRadius, int maxSize,
                                  float a, float r, float g, float b, boolean renderVanillaOutline) {
-        var ctx = group.context();
-        var lines = group.outline();
         var level = GameUtil.level();
         var stack = group.poseStack();
         //? if >= 26.2 {
-        /*var collector = ctx.submitNodeCollector();
-        *///?} else if >= 26.1 {
-        /*var buffers = ctx.bufferSource();
-        *///?} else {
-        var buffers = ctx.consumers();
+        /*var collector = group.collector();
+         *///?} else {
+        var buffers = group.buffers();
         //?}
-        if (level == null/*? if < 1.21.11 {*/|| stack == null || buffers == null/*?}*/) return true;
+        if (level == null/*? if < 1.21.11 {*//*|| stack == null || buffers == null*//*?}*/) return true;
 
-        var pos = lines./*? if >= 1.21.11 {*//*pos()*//*?} else {*/blockPos()/*?}*/;
+        var pos = group.blockPos();
         var shape = getCachedShape(level, player, pos, level.getBlockState(pos), stateMatch, maxRadius, maxSize);
         if (shape == null) return true; // single block, vanilla outline is fine
 
@@ -87,12 +83,12 @@ public class BlockGroupOutlineRenderer {
         collector.submitShapeOutline(stack, shape, RenderTypes.lines(), ARGB.colorFromFloat(a, r, g, b), GameUtil.window().getAppropriateLineWidth(), false);
         stack.popPose();
         *///?} else if >= 1.21.11 {
-        /*var buffer = buffers.getBuffer(RenderTypes.lines());
+        var buffer = buffers.getBuffer(RenderTypes.lines());
         renderOutlineShape(stack, buffer, shape, -camera.x, -camera.y, -camera.z, a, r, g, b);
-        *///?} else {
-        var buffer = buffers.getBuffer(RenderType.lines());
+        //?} else {
+        /*var buffer = buffers.getBuffer(RenderType.lines());
         renderOutlineShape(stack, buffer, shape, -camera.x, -camera.y, -camera.z, a, r, g, b);
-        //?}
+        *///?}
         return renderVanillaOutline;
     }
 
@@ -102,8 +98,7 @@ public class BlockGroupOutlineRenderer {
     }
 
     // Get cached group shape, rebuild it every 10 ticks or if the targeted block changed
-    private static VoxelShape getCachedShape(ClientLevel level, Player player, BlockPos origin, BlockState state, Predicate<BlockState> stateMatch,
-                                             int maxRadius, int maxSize) {
+    private static VoxelShape getCachedShape(ClientLevel level, Player player, BlockPos origin, BlockState state, Predicate<BlockState> stateMatch, int maxRadius, int maxSize) {
         long tickBucket = level.getGameTime() / 10; // refresh at most every 10 ticks
         if (!origin.equals(originCache) || tickBucket != tickBucketCache) {
             originCache = origin.immutable();
@@ -128,12 +123,12 @@ public class BlockGroupOutlineRenderer {
 
     // Draw group outlines (pre-26.2 only, 26.2+ submits straight from render)
     //? if >= 1.21.11 && < 26.2 {
-    /*private static void renderOutlineShape(PoseStack stack, VertexConsumer buffer, VoxelShape shape, double xOffset, double yOffset, double zOffset, float a, float r, float g, float b) {
+    private static void renderOutlineShape(PoseStack stack, VertexConsumer buffer, VoxelShape shape, double xOffset, double yOffset, double zOffset, float a, float r, float g, float b) {
         ShapeRenderer.renderShape(stack, buffer, shape, xOffset, yOffset, zOffset, ARGB.colorFromFloat(a, r, g, b), GameUtil.window().getAppropriateLineWidth());
     }
-    *///?} else if < 1.21.11 {
-    private static void renderOutlineShape(PoseStack stack, VertexConsumer buffer, VoxelShape shape, double xOffset, double yOffset, double zOffset, float a, float r, float g, float b) {
+    //?} else if < 1.21.11 {
+    /*private static void renderOutlineShape(PoseStack stack, VertexConsumer buffer, VoxelShape shape, double xOffset, double yOffset, double zOffset, float a, float r, float g, float b) {
         LevelRenderer.renderShape(stack, buffer, shape, xOffset, yOffset, zOffset, r, g, b, a);
     }
-    //?}
+    *///?}
 }

@@ -24,12 +24,12 @@ public class BreadthFirstSearch implements SearchAlgorithm {
         var found = new ArrayList<BlockPos>();
 
         //? if >= 1.21.11 {
-        /*var accept = BlockPos.TraversalNodeStatus.ACCEPT;
+        var accept = BlockPos.TraversalNodeStatus.ACCEPT;
         var skip = BlockPos.TraversalNodeStatus.SKIP;
-        *///?} else {
-        var accept = true;
+        //?} else {
+        /*var accept = true;
         var skip = false;
-        //?}
+        *///?}
 
         // Include origin in traversal so the search can expand from it
         BlockPos.breadthFirstTraversal(origin, maxRadius, maxSize + 1, (current, queue) -> {

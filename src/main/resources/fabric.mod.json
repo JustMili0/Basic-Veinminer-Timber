@@ -26,8 +26,9 @@
   ],
   "accessWidener": "bvat.accesswidener",
   "depends": {
+    "minecraft": "${minecraft}",
     "fabricloader": ">=${loader}",
-    "minecraft": "${minecraft}"
+    "fabric-api": "*"
   },
   "custom": {
     "modmenu": {
