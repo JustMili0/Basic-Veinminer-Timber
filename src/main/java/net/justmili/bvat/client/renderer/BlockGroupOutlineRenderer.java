@@ -27,11 +27,12 @@ import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 //?}
 //? if >= 1.21.11 {
 /*import net.minecraft.util.ARGB;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
-*///?} else {
+ *///?} else {
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.RenderType;
 //?}
+//? if >= 26.2 {
+/*import net.minecraft.client.renderer.rendertype.RenderTypes;
+ *///?}
 //? if >= 1.21.11 && < 26.2 {
 /*import net.minecraft.client.renderer.ShapeRenderer;
  *///?}
@@ -63,31 +64,20 @@ public class BlockGroupOutlineRenderer {
                                  float a, float r, float g, float b, boolean renderVanillaOutline) {
         var level = GameUtil.level();
         var stack = group.poseStack();
-        //? if >= 26.2 {
-        /*var collector = group.collector();
-         *///?} else {
-        var buffers = group.buffers();
-        //?}
-        if (level == null/*? if < 1.21.11 {*/|| stack == null || buffers == null/*?}*/) return true;
+        if (level == null || stack == null) return true;
 
+        var camera = group.cameraPos();
         var pos = group.blockPos();
         var shape = getCachedShape(level, player, pos, level.getBlockState(pos), stateMatch, maxRadius, maxSize);
         if (shape == null) return true; // single block, vanilla outline is fine
 
-        var camera = group.cameraPos();
-
         //? if >= 26.2 {
         /*stack.pushPose();
         stack.translate(-camera.x, -camera.y, -camera.z);
-        collector.submitShapeOutline(stack, shape, RenderTypes.lines(), ARGB.colorFromFloat(a, r, g, b), GameUtil.window().getAppropriateLineWidth(), false);
+        group.collector().submitShapeOutline(stack, shape, RenderTypes.lines(), ARGB.colorFromFloat(a, r, g, b), GameUtil.window().getAppropriateLineWidth(), false);
         stack.popPose();
-        *///?} else if >= 1.21.11 {
-        /*var buffer = buffers.getBuffer(RenderTypes.lines());
-        *///?} else {
-        var buffer = buffers.getBuffer(RenderType.lines());
-        //?}
-        //? if < 26.2 {
-        renderOutlineShape(stack, buffer, shape, -camera.x, -camera.y, -camera.z, a, r, g, b);
+        *///?} else if < 26.2 {
+        renderOutlineShape(stack, group.lines(), shape, -camera.x, -camera.y, -camera.z, a, r, g, b);
         //?}
         return renderVanillaOutline;
     }
@@ -122,13 +112,13 @@ public class BlockGroupOutlineRenderer {
     }
 
     // Draw group outlines (pre-26.2 only, 26.2+ submits straight from render)
-    //? if >= 1.21.11 && < 26.2 {
-    /*private static void renderOutlineShape(PoseStack stack, VertexConsumer buffer, VoxelShape shape, double xOffset, double yOffset, double zOffset, float a, float r, float g, float b) {
-        ShapeRenderer.renderShape(stack, buffer, shape, xOffset, yOffset, zOffset, ARGB.colorFromFloat(a, r, g, b), GameUtil.window().getAppropriateLineWidth());
-    }
-    *///?} else if < 1.21.11 {
+    //? if < 26.2 {
     private static void renderOutlineShape(PoseStack stack, VertexConsumer buffer, VoxelShape shape, double xOffset, double yOffset, double zOffset, float a, float r, float g, float b) {
+        //? if < 1.21.11 {
         LevelRenderer.renderShape(stack, buffer, shape, xOffset, yOffset, zOffset, r, g, b, a);
+        //?} else if >= 1.21.11 {
+        /*ShapeRenderer.renderShape(stack, buffer, shape, xOffset, yOffset, zOffset, ARGB.colorFromFloat(a, r, g, b), GameUtil.window().getAppropriateLineWidth());*/
+        //?}
     }
     //?}
 }

@@ -16,7 +16,12 @@ import net.minecraft.client.renderer.state.level.BlockOutlineRenderState;
 //? if >= 26.2 {
 /*import net.minecraft.client.renderer.SubmitNodeCollector;
  *///?} else {
-import net.minecraft.client.renderer.MultiBufferSource;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+//?}
+//? if >= 1.21.11 && < 26.2 {
+/*import net.minecraft.client.renderer.rendertype.RenderTypes;
+ *///?} else if < 1.21.11 {
+import net.minecraft.client.renderer.RenderType;
 //?}
 
 /**
@@ -40,13 +45,10 @@ public record BlockGroupOutlineContext(/*? if >= 26.1 {*//*LevelRenderContext*//
     /*public SubmitNodeCollector collector() {
         return context.submitNodeCollector();
     }
-    *///?} else if >= 26.1 {
-    /*public MultiBufferSource buffers() {
-        return context.bufferSource();
-    }
     *///?} else {
-    public MultiBufferSource buffers() {
-        return context.consumers();
+    public VertexConsumer lines() {
+        // TODO: null-check bufferSource()/consumers() and return something that won't crash the game
+        return context./*? if >= 26.1 {*//*bufferSource()*//*?} else {*/consumers()/*?}*/.getBuffer(/*? if >= 1.21.11 {*//*RenderTypes*//*?} else {*/RenderType/*?}*/.lines());
     }
     //?}
 }
