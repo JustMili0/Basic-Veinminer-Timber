@@ -4,8 +4,8 @@ plugins {
 }
 
 // DO NOT set group = ...!
-version = "${property("mod.version")}+${sc.current.version}"
-base.archivesName = property("mod.id") as String
+version = "${property("mod.version")}+mc${sc.current.version}-Fabric"
+base.archivesName = property("mod.archives_base_name") as String
 
 val requiredJava: JavaVersion = when {
     sc.current.parsed >= "26.1" -> JavaVersion.VERSION_25
@@ -34,14 +34,6 @@ repositories {
 }
 
 dependencies {
-    /**
-     * Fetches only the required Fabric API modules to not waste time downloading all of them for each version.
-     * @see <a href="https://github.com/FabricMC/fabric">List of Fabric API modules</a>
-     */
-    fun fapi(vararg modules: String) {
-        for (it in modules) modImplementation(fabricApi.module(it, sc.properties["deps.fabric_api"]))
-    }
-
     minecraft("com.mojang:minecraft:${sc.current.version}")
     // Applies Mojang Mappings on obfuscated versions
     loomx.applyMojangMappings()
@@ -56,7 +48,7 @@ dependencies {
 loom {
     fabricModJsonPath = rootProject.file("src/main/resources/fabric.mod.json") // Useful for interface injection
     accessWidenerPath = sc.process(
-        rootProject.file("src/main/resources/bvat.accesswidener"),
+        rootProject.file("src/main/resources/vnt.accesswidener"),
         "build/processed.accesswidener"
     )
 
@@ -73,7 +65,6 @@ loom {
 }
 
 java {
-    withSourcesJar()
     targetCompatibility = requiredJava
     sourceCompatibility = requiredJava
 
@@ -106,9 +97,7 @@ tasks {
 
     // Includes the license file in the built mod
     withType<Jar> {
-        val name = project.property("mod.id")
-        inputs.property("mod_id", name)
-        from("../../LICENSE") { rename { "$it-$name" } }
+        from("../../LICENSE") { rename { it } }
     }
 
     register<Copy>("buildAndCollect") {
@@ -116,8 +105,8 @@ tasks {
         description = "Builds mod jars and copies results to `build/libs/{mod version}/`"
 
         inputs.property("version", project.property("mod.version"))
-        // loomx.mod(Sources)Jar returns the jar task for the applied loom variant
-        from(loomx.modJar.flatMap { it.archiveFile }, loomx.modSourcesJar.flatMap { it.archiveFile })
+        // loomx.modJar returns the jar task for the applied loom variant
+        from(loomx.modJar.flatMap { it.archiveFile })
         into(rootProject.layout.buildDirectory.file("libs/${project.property("mod.version")}"))
     }
 }

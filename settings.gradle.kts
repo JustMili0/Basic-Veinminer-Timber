@@ -28,4 +28,4 @@ stonecutter {
     }
 }
 
-rootProject.name = "Basic Veinminer & Timber"
+rootProject.name = "Vein n' Timber"

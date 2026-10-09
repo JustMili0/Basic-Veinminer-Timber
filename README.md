@@ -1,5 +1,5 @@
-# Basic Veinminer & Timber
-The most basic you can get
+# Vein n' Timber
+Basic veinminer and timber in one
 
 <hr>
 

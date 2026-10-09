@@ -3,28 +3,28 @@
   "id": "${id}",
   "version": "${version}",
   "name": "${name}",
-  "description": "A really basic 2-in-1 veinminer amd timber",
+  "description": "A really basic veinminer and timber in one",
   "authors": ["JustMili"],
   "contact": {
-    "homepage": "https://modrinth.com/mod/basic-veinminer-and-timber",
-    "sources": "https://github.com/JustMili0/Basic-Veinminer-Timber",
-    "issues": "https://github.com/JustMili0/Basic-Veinminer-Timber/issues"
+    "homepage": "https://modrinth.com/mod/vein-n-timber",
+    "sources": "https://github.com/JustMili0/Vein-n-Timber",
+    "issues": "https://github.com/JustMili0/Vein-n-Timber/issues"
   },
   "license": "MIT",
   "icon": "icon.png",
   "environment": "*",
   "entrypoints": {
     "main": [
-      "net.justmili.bvat.BVaT"
+      "net.justmili.vnt.VnT"
     ],
     "client" : [
-      "net.justmili.bvat.client.FabricClient"
+      "net.justmili.vnt.client.FabricClient"
     ]
   },
   "mixins": [
-    "bvat.mixins.json"
+    "vnt.mixins.json"
   ],
-  "accessWidener": "bvat.accesswidener",
+  "accessWidener": "vnt.accesswidener",
   "depends": {
     "minecraft": "${minecraft}",
     "fabricloader": ">=${loader}",
@@ -33,7 +33,7 @@
   "custom": {
     "modmenu": {
       "links": {
-        "modmenu.modrinth": "https://modrinth.com/mod/basic-veinminer-and-timber",
+        "modmenu.modrinth": "https://modrinth.com/mod/vein-n-timber",
         "modmenu.discord": "https://discord.gg/DPEw9DU2vT",
         "modmenu.kofi": "https://ko-fi.com/justmilivt",
         "modmenu.twitter": "https://x.com/JustMiliVT"
