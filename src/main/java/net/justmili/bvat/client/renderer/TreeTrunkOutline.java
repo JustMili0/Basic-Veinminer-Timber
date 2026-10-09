@@ -2,7 +2,6 @@ package net.justmili.bvat.client.renderer;
 
 import net.justmili.bvat.content.mechanics.logic.Timber;
 import net.justmili.bvat.core.util.BlockBreaking;
-import net.justmili.bvat.core.util.client.GameUtil;
 import net.justmili.bvat.core.util.client.OutlineRGB;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
@@ -14,15 +13,15 @@ public class TreeTrunkOutline {
 
     // Render white outline around the whole tree trunk when the player looks at a log with an axe in hand
     public static boolean onBlockOutline(BlockGroupOutlineContext group) {
-        var player = GameUtil.player();
-        var level = GameUtil.level();
+        var player = group.player();
+        var level = group.level();
         if (player == null || level == null) return true;
 
         var state = level.getBlockState(group.blockPos());
         if (!Timber.canSeeTree(player, state)) return true;
         if (!isTree(level, group.blockPos())) return true;
 
-        float rgb = OutlineRGB.get();
+        float rgb = OutlineRGB.get(player);
         return BlockGroupOutlineRenderer.render(group, player, Timber::isLog, Timber.MAX_RADIUS, Timber.MAX_TRUNK, 0.6f, rgb, rgb, rgb, true);
     }
 

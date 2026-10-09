@@ -2,7 +2,6 @@ package net.justmili.bvat.client.renderer;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.justmili.bvat.core.util.client.GameUtil;
 import net.justmili.bvat.core.util.search.SearchAlgorithms;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
@@ -17,13 +16,6 @@ import java.util.function.Predicate;
 //? if < 26.2 {
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-//?}
-//? if >= 26.1 {
-//?} else if >= 1.21.11 {
-/*import net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderContext;
-import net.minecraft.client.renderer.state.BlockOutlineRenderState;
-*///?} else {
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 //?}
 //? if >= 1.21.11 {
 /*import net.minecraft.util.ARGB;
@@ -62,29 +54,45 @@ public class BlockGroupOutlineRenderer {
      */
     public static boolean render(BlockGroupOutlineContext group, Player player, Predicate<BlockState> stateMatch, int maxRadius, int maxSize,
                                  float a, float r, float g, float b, boolean renderVanillaOutline) {
-        var level = GameUtil.level();
-        var stack = group.poseStack();
-        if (level == null || stack == null) return true;
+        var level = group.level();
+        if (level == null) return true;
 
         var camera = group.cameraPos();
         var pos = group.blockPos();
         var shape = getCachedShape(level, player, pos, level.getBlockState(pos), stateMatch, maxRadius, maxSize);
         if (shape == null) return true; // single block, vanilla outline is fine
 
-        //? if >= 26.2 {
-        /*stack.pushPose();
-        stack.translate(-camera.x, -camera.y, -camera.z);
-        group.collector().submitShapeOutline(stack, shape, RenderTypes.lines(), ARGB.colorFromFloat(a, r, g, b), GameUtil.window().getAppropriateLineWidth(), false);
-        stack.popPose();
-        *///?} else if < 26.2 {
-        renderOutlineShape(stack, group.lines(), shape, -camera.x, -camera.y, -camera.z, a, r, g, b);
-        //?}
+        renderOutlineShape(group, shape, -camera.x, -camera.y, -camera.z, a, r, g, b);
         return renderVanillaOutline;
     }
 
     public static boolean render(BlockGroupOutlineContext group, Player player, Predicate<BlockState> stateMatch, int maxRadius, int maxSize, boolean renderVanillaOutline) {
         // Render with default outline ARGB values
         return render(group, player, stateMatch, maxRadius, maxSize, 0.4f, 0f, 0f, 0f, renderVanillaOutline);
+    }
+
+    // Draw group outlines
+    private static void renderOutlineShape(BlockGroupOutlineContext group, VoxelShape shape, double cameraX, double cameraY, double cameraZ, float a, float r, float g, float b) {
+        var pose = group.poseStack();
+        //? if < 26.2 {
+        var lines = group.lines();
+        //?}
+        //? if >= 1.21.11 {
+        /*var lineWidth = group.window().getAppropriateLineWidth();
+        var color = ARGB.colorFromFloat(a, r, g, b);
+        *///?}
+
+        //? if < 1.21.11 {
+        LevelRenderer.renderShape(pose, lines, shape, cameraX, cameraY, cameraZ, r, g, b, a);
+         //?} else if >= 1.21.11 && < 26.2 {
+        /*ShapeRenderer.renderShape(pose, lines, shape, cameraX, cameraY, cameraZ, color, lineWidth);
+        *///?} else if >= 26.2 {
+        /*pose.pushPose();
+        pose.translate(cameraX, cameraY, cameraZ);
+        // TODO: Make group.lines() also be able to return RenderTypes.lines()
+        group.collector().submitShapeOutline(pose, shape, RenderTypes.lines(), color, lineWidth, false);
+        pose.popPose();
+        *///?}
     }
 
     // Get cached group shape, rebuild it every 10 ticks or if the targeted block changed
@@ -110,15 +118,4 @@ public class BlockGroupOutlineRenderer {
         }
         return shape;
     }
-
-    // Draw group outlines (pre-26.2 only, 26.2+ submits straight from render)
-    //? if < 26.2 {
-    private static void renderOutlineShape(PoseStack stack, VertexConsumer buffer, VoxelShape shape, double xOffset, double yOffset, double zOffset, float a, float r, float g, float b) {
-        //? if < 1.21.11 {
-        LevelRenderer.renderShape(stack, buffer, shape, xOffset, yOffset, zOffset, r, g, b, a);
-        //?} else if >= 1.21.11 {
-        /*ShapeRenderer.renderShape(stack, buffer, shape, xOffset, yOffset, zOffset, ARGB.colorFromFloat(a, r, g, b), GameUtil.window().getAppropriateLineWidth());*/
-        //?}
-    }
-    //?}
 }
