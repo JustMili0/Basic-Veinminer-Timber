@@ -1,3 +1,5 @@
+- Make an icon
+- Update mod page
 - Publish
 - Add to maven (also add last AS and SiB versions to maven)
 - Make a quick NeoForge port for 1.21.1 and 26.1.2 (Or ask Blue to make one cuz he's fast)
