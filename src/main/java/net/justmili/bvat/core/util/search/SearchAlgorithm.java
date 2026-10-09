@@ -20,7 +20,11 @@ public interface SearchAlgorithm {
      * Iterates a cube around center, center included. The returned pos is reused between iterations; call .immutable() before storing it.
      */
     default Iterable<BlockPos> withinClosed(BlockPos center, int radius) {
-        return BlockPos.betweenClosed(center.offset(-radius, -radius, -radius), center.offset(radius, radius, radius));
+        return withinClosed(center.getX(), center.getY(), center.getZ(), radius);
+    }
+
+    default Iterable<BlockPos> withinClosed(int x, int y, int z, int radius) {
+        return BlockPos.betweenClosed(x - radius, y - radius, z - radius, x + radius, y + radius, z + radius);
     }
 
     /**
@@ -28,7 +32,7 @@ public interface SearchAlgorithm {
      * Whether origin itself can be in the result depends on the algorithm.
      *
      * @param maxRadius how far from origin to search, as a cube
-     * @param maxSize max amount of blocks to return
+     * @param maxSize   max amount of blocks to return
      */
     List<BlockPos> search(Level level, BlockPos origin, Predicate<BlockState> stateMatch, int maxRadius, int maxSize);
 

@@ -13,18 +13,11 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 
 import java.util.function.Predicate;
 
-//? if < 26.2 {
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
-//?}
 //? if >= 1.21.11 {
-/*import net.minecraft.util.ARGB;
- *///?} else {
-import net.minecraft.client.renderer.LevelRenderer;
-//?}
-//? if >= 26.2 {
-/*import net.minecraft.client.renderer.rendertype.RenderTypes;
- *///?}
+import net.minecraft.util.ARGB;
+ //?} else {
+/*import net.minecraft.client.renderer.LevelRenderer;
+*///?}
 //? if >= 1.21.11 && < 26.2 {
 /*import net.minecraft.client.renderer.ShapeRenderer;
  *///?}
@@ -55,7 +48,7 @@ public class BlockGroupOutlineRenderer {
     public static boolean render(BlockGroupOutlineContext group, Player player, Predicate<BlockState> stateMatch, int maxRadius, int maxSize,
                                  float a, float r, float g, float b, boolean renderVanillaOutline) {
         var level = group.level();
-        if (level == null) return true;
+        if (level == null/*? if < 1.21.11 {*//*|| group.poseStack() == null || group.lines() == null*//*?}*/) return true;
 
         var camera = group.cameraPos();
         var pos = group.blockPos();
@@ -74,25 +67,24 @@ public class BlockGroupOutlineRenderer {
     // Draw group outlines
     private static void renderOutlineShape(BlockGroupOutlineContext group, VoxelShape shape, double cameraX, double cameraY, double cameraZ, float a, float r, float g, float b) {
         var pose = group.poseStack();
-        //? if < 26.2 {
         var lines = group.lines();
-        //?}
-        //? if >= 1.21.11 {
-        /*var lineWidth = group.window().getAppropriateLineWidth();
+        //? if < 1.21.11 {
+        /*if (lines == null) return;
+        *///?} else if >= 1.21.11 {
+        var lineWidth = group.window().getAppropriateLineWidth();
         var color = ARGB.colorFromFloat(a, r, g, b);
-        *///?}
+        //?}
 
         //? if < 1.21.11 {
-        LevelRenderer.renderShape(pose, lines, shape, cameraX, cameraY, cameraZ, r, g, b, a);
-         //?} else if >= 1.21.11 && < 26.2 {
+        /*LevelRenderer.renderShape(pose, lines, shape, cameraX, cameraY, cameraZ, r, g, b, a);
+        *///?} else if < 26.2 {
         /*ShapeRenderer.renderShape(pose, lines, shape, cameraX, cameraY, cameraZ, color, lineWidth);
-        *///?} else if >= 26.2 {
-        /*pose.pushPose();
+         *///?} else {
+        pose.pushPose();
         pose.translate(cameraX, cameraY, cameraZ);
-        // TODO: Make group.lines() also be able to return RenderTypes.lines()
-        group.collector().submitShapeOutline(pose, shape, RenderTypes.lines(), color, lineWidth, false);
+        group.collector().submitShapeOutline(pose, shape, lines, color, lineWidth, false);
         pose.popPose();
-        *///?}
+        //?}
     }
 
     // Get cached group shape, rebuild it every 10 ticks or if the targeted block changed

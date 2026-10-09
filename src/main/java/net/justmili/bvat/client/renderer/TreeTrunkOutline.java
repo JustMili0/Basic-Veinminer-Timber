@@ -12,7 +12,7 @@ public class TreeTrunkOutline {
     private static boolean treeCache;
 
     // Render white outline around the whole tree trunk when the player looks at a log with an axe in hand
-    public static boolean onBlockOutline(BlockGroupOutlineContext group) {
+    public static boolean render(BlockGroupOutlineContext group) {
         var player = group.player();
         var level = group.level();
         if (player == null || level == null) return true;

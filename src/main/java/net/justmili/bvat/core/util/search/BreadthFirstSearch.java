@@ -1,5 +1,7 @@
 package net.justmili.bvat.core.util.search;
 
+import it.unimi.dsi.fastutil.longs.LongArrayFIFOQueue;
+import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -22,24 +24,24 @@ public class BreadthFirstSearch implements SearchAlgorithm {
     @Override
     public List<BlockPos> search(Level level, BlockPos origin, Predicate<BlockState> stateMatch, int maxRadius, int maxSize) {
         var found = new ArrayList<BlockPos>();
+        var visited = new LongOpenHashSet();
+        var queue = new LongArrayFIFOQueue();
 
-        //? if >= 1.21.11 {
-        /*var accept = BlockPos.TraversalNodeStatus.ACCEPT;
-        var skip = BlockPos.TraversalNodeStatus.SKIP;
-        *///?} else {
-        var accept = true;
-        var skip = false;
-        //?}
+        visited.add(origin.asLong());
+        queue.enqueue(origin.asLong());
 
-        // Include origin in traversal so the search can expand from it
-        BlockPos.breadthFirstTraversal(origin, maxRadius, maxSize + 1, (current, queue) -> {
-            for (var next : withinClosed(current, 1)) queue.accept(next.immutable());
-        }, current -> {
-            if (current.equals(origin)) return accept;
-            if (!stateMatch.test(level.getBlockState(current))) return skip;
-            found.add(current);
-            return accept;
-        });
+        for (var depth = 0; depth < maxRadius && !queue.isEmpty(); depth++) {
+            for (var remaining = queue.size(); remaining > 0; remaining--) {
+                var current = queue.dequeueLong();
+
+                for (var next : withinClosed(BlockPos.getX(current), BlockPos.getY(current), BlockPos.getZ(current), 1)) {
+                    if (found.size() >= maxSize) return found;
+                    if (!visited.add(next.asLong()) || !stateMatch.test(level.getBlockState(next))) continue;
+                    found.add(next.immutable());
+                    queue.enqueue(next.asLong());
+                }
+            }
+        }
         return found;
     }
 

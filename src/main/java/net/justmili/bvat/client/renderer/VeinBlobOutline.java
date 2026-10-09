@@ -7,7 +7,7 @@ import net.justmili.bvat.core.util.client.OutlineRGB;
 public class VeinBlobOutline {
 
     // Render white outline around the whole ore vein when the player looks at it with a pickaxe in hand
-    public static boolean onBlockOutline(BlockGroupOutlineContext group) {
+    public static boolean render(BlockGroupOutlineContext group) {
         var player = group.player();
         var level = group.level();
         if (player == null || level == null) return true;
