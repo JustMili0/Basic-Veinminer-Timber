@@ -13,14 +13,19 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 
 import java.util.function.Predicate;
 
-//? if >= 1.21.11 {
-import net.minecraft.util.ARGB;
- //?} else {
-/*import net.minecraft.client.renderer.LevelRenderer;
+//? if < 26.2 {
+import com.mojang.blaze3d.vertex.VertexConsumer;
+//?} else {
+/*import net.minecraft.client.renderer.rendertype.RenderType;
 *///?}
+//? if >= 1.21.11 {
+/*import net.minecraft.util.ARGB;
+ *///?} else {
+import net.minecraft.client.renderer.LevelRenderer;
+//?}
 //? if >= 1.21.11 && < 26.2 {
 /*import net.minecraft.client.renderer.ShapeRenderer;
- *///?}
+*///?}
 
 /**
  * Outlines a whole group of connected blocks instead of just the one the player is looking at.
@@ -48,14 +53,15 @@ public class BlockGroupOutlineRenderer {
     public static boolean render(BlockGroupOutlineContext group, Player player, Predicate<BlockState> stateMatch, int maxRadius, int maxSize,
                                  float a, float r, float g, float b, boolean renderVanillaOutline) {
         var level = group.level();
-        if (level == null/*? if < 1.21.11 {*//*|| group.poseStack() == null || group.lines() == null*//*?}*/) return true;
+        var lines = group.lines();
+        if (level == null/*? if < 1.21.11 {*/|| group.poseStack() == null || group.lines() == null/*?}*/) return true;
 
-        var camera = group.cameraPos();
         var pos = group.blockPos();
+        var camera = group.cameraPos();
         var shape = getCachedShape(level, player, pos, level.getBlockState(pos), stateMatch, maxRadius, maxSize);
         if (shape == null) return true; // single block, vanilla outline is fine
 
-        renderOutlineShape(group, shape, -camera.x, -camera.y, -camera.z, a, r, g, b);
+        renderOutlineShape(group, lines, shape, -camera.x, -camera.y, -camera.z, a, r, g, b);
         return renderVanillaOutline;
     }
 
@@ -65,26 +71,24 @@ public class BlockGroupOutlineRenderer {
     }
 
     // Draw group outlines
-    private static void renderOutlineShape(BlockGroupOutlineContext group, VoxelShape shape, double cameraX, double cameraY, double cameraZ, float a, float r, float g, float b) {
+    private static void renderOutlineShape(BlockGroupOutlineContext group,/*? if < 26.2 {*/VertexConsumer/*?} else {*//*RenderType*//*?}*/ lines,
+                                           VoxelShape shape, double cameraX, double cameraY, double cameraZ, float a, float r, float g, float b) {
         var pose = group.poseStack();
-        var lines = group.lines();
-        //? if < 1.21.11 {
-        /*if (lines == null) return;
-        *///?} else if >= 1.21.11 {
-        var lineWidth = group.window().getAppropriateLineWidth();
+        //? if >= 1.21.11 {
+        /*var lineWidth = group.window().getAppropriateLineWidth();
         var color = ARGB.colorFromFloat(a, r, g, b);
-        //?}
+        *///?}
 
         //? if < 1.21.11 {
-        /*LevelRenderer.renderShape(pose, lines, shape, cameraX, cameraY, cameraZ, r, g, b, a);
-        *///?} else if < 26.2 {
+        LevelRenderer.renderShape(pose, lines, shape, cameraX, cameraY, cameraZ, r, g, b, a);
+        //?} else if < 26.2 {
         /*ShapeRenderer.renderShape(pose, lines, shape, cameraX, cameraY, cameraZ, color, lineWidth);
          *///?} else {
-        pose.pushPose();
+        /*pose.pushPose();
         pose.translate(cameraX, cameraY, cameraZ);
         group.collector().submitShapeOutline(pose, shape, lines, color, lineWidth, false);
         pose.popPose();
-        //?}
+        *///?}
     }
 
     // Get cached group shape, rebuild it every 10 ticks or if the targeted block changed
