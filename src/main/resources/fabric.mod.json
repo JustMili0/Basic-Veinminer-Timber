@@ -3,8 +3,11 @@
   "id": "${id}",
   "version": "${version}",
   "name": "${name}",
-  "description": "A really basic veinminer and timber in one",
+  "description": "A really basic veinminer and timber mod in one",
   "authors": ["JustMili"],
+  "contributors": [
+    "CallMeArthys - Mod Icon"
+  ],
   "contact": {
     "homepage": "https://modrinth.com/mod/vein-n-timber",
     "sources": "https://github.com/JustMili0/Vein-n-Timber",

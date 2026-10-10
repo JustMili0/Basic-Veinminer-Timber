@@ -1,5 +1,6 @@
 package net.justmili.vnt.content.mechanics.logic;
 
+import net.justmili.vnt.config.Config;
 import net.justmili.vnt.core.util.BlockBreaking;
 import net.justmili.vnt.core.util.Maths;
 import net.justmili.vnt.core.util.search.SearchAlgorithms;
@@ -18,9 +19,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Timber {
-    public static final int MAX_RADIUS = 32;
-    public static final int MAX_TRUNK = 256;
-    public static final int MAX_LEAVES = 256;
+    public static final int MAX_TRUNK = Config.maxTrunkSize;
+    public static final int MAX_LEAVES = Config.maxLeavesSize;
+    public static final int MAX_RADIUS = 48;
 
     public static boolean canSeeTree(Player player, BlockState state) {
         return !player.isCreative() && isLog(state) && player.getMainHandItem().is(ItemTags.AXES);
@@ -37,7 +38,7 @@ public class Timber {
         var tool = player.getMainHandItem();
         for (var log : logs) {
             if (!BlockBreaking.canAfford(tool)) break; // Stop if tool durability is <= 1
-            BlockBreaking.destroy(level, player, tool, level.getBlockState(log), log, true);
+            BlockBreaking.destroy(level, player, tool, level.getBlockState(log), log, Config.trunkBreakParticles);
         }
 
         // A few leaf sounds instead of one per leaf to not make such a noise
@@ -51,7 +52,7 @@ public class Timber {
         }
         // Break leaves, but don't damage tool
         for (var leaf : leaves) {
-            BlockBreaking.destroy(level, player, tool, level.getBlockState(leaf), leaf, false, false);
+            BlockBreaking.destroy(level, player, tool, level.getBlockState(leaf), leaf, Config.leavesBreakParticles, false);
         }
     }
 

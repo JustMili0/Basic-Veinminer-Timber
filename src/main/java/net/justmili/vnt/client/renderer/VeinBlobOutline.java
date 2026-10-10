@@ -15,7 +15,8 @@ public class VeinBlobOutline {
         var state = level.getBlockState(group.blockPos());
         if (!Veinminer.canSeeVein(player, state)) return true;
 
-        float rgb = OutlineRGB.get(player);
-        return BlockGroupOutlineRenderer.render(group, player, TagUtil.matchOreTags(state), Veinminer.MAX_RADIUS, Veinminer.MAX_VEIN, 0.6f, rgb, rgb, rgb, true);
+        var color = OutlineRGB.get(player);
+        return BlockGroupOutlineRenderer.render(group, player, TagUtil.matchOreTags(state), Veinminer.MAX_RADIUS, Veinminer.MAX_VEIN,
+            color.a(), color.r(), color.g(), color.b(), true);
     }
 }

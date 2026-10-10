@@ -1,6 +1,7 @@
 package net.justmili.vnt;
 
 import net.fabricmc.api.ModInitializer;
+import net.justmili.vnt.config.Config;
 import net.justmili.vnt.core.registries.EventRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +15,7 @@ public class VnT implements ModInitializer {
     @Override
     public void onInitialize() {
         LOGGER.info("Initializing {} ({}) version {}", NAME, ID, BUILD);
+        Config.initCommon();
         EventRegistry.init();
     }
 }

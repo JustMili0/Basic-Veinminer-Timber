@@ -1,15 +1,17 @@
 # Vein n' Timber
 Basic veinminer and timber in one
 
+<small>*Icon by [CallMeArthys](https://modrinth.com/user/CallMeArthys)*</small>
+
 <hr>
 
 ## Why?
-A lot of mods and datapacks just don't have all the combined features that *I would like*, so I made a mod that does. 
+A lot of mods and datapacks just don't have all the combined features that *I would like*, so I made a mod that does.
 And it's both veinminer and timber :D
 
 ## Notice
-This mod currently does not have a config. It'll be added in update 1.1, and post 1.1 no content update will be added 
-and the mod will only get updates for latest Minecraft (Fabric) versions and major LTS for NeoForge (like 1.21.1, 26.1.2 etc)
+This mod currently does not have a config. It'll be added in update 1.1, and post 1.1 no content update will be added
+and the mod will only get updates for latest Minecraft (Fabric) versions and major LTS for NeoForge (like 1.21.1, 26.1.2 etc.)
 
 <hr>
 
@@ -28,6 +30,7 @@ and the mod will only get updates for latest Minecraft (Fabric) versions and maj
   - Also breaks the natural leaves, without using durability on them
   - Block breaking will stop if your tool is at 1 durability left
   - On the client, the whole trunk is outlined
+
 *The mod is not required on the client and can work purely on the server.*<br>
 *Client-side installation is optional and for visual effects only.*
 

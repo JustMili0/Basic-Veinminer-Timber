@@ -21,8 +21,9 @@ public class TreeTrunkOutline {
         if (!Timber.canSeeTree(player, state)) return true;
         if (!isTree(level, group.blockPos())) return true;
 
-        float rgb = OutlineRGB.get(player);
-        return BlockGroupOutlineRenderer.render(group, player, Timber::isLog, Timber.MAX_RADIUS, Timber.MAX_TRUNK, 0.6f, rgb, rgb, rgb, true);
+        var color = OutlineRGB.get(player);
+        return BlockGroupOutlineRenderer.render(group, player, Timber::isLog, Timber.MAX_RADIUS, Timber.MAX_TRUNK,
+            color.a(), color.r(), color.g(), color.b(), true);
     }
 
     private static boolean isTree(Level level, BlockPos origin) {
