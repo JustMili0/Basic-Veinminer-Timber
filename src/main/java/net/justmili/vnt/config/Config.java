@@ -8,7 +8,7 @@ public class Config {
     - List of blocks/tags considered as leaves
     - List of veinmine tools (item/tag)
     - List of timber tools (item/tag)
-    - Max radius entires of veinminer and timber
+    - Max radius entries of veinminer and timber
     */
     public static int maxVeinSize;
     public static int maxTrunkSize;
