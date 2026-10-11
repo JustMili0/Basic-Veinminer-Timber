@@ -1,6 +1,6 @@
 package net.justmili.vnt.config;
 
-// To be finalized and implemented in 1.1 with Millie's Core Libraries
+// To be finalized and fully implemented in 1.1 with Millie's Core Libraries
 public class Config {
     /* To additionally add in 1.1:
     - List of blocks/tags that can be veinmined
@@ -10,6 +10,8 @@ public class Config {
     - List of timber tools (item/tag)
     - Max radius entries of veinminer and timber
     */
+    public static boolean shiftToVeinmine;
+    public static boolean shiftToTimber;
     public static int maxVeinSize;
     public static int maxTrunkSize;
     public static int maxLeavesSize;
@@ -18,6 +20,7 @@ public class Config {
     public static DropPlacements veinDropPlace;
     public static DropPlacements trunkDropPlace;
     public static DropPlacements leavesDropPlace;
+    public static boolean includeLeavesDrops;
 
     public static boolean veinBreakParticles;
     public static boolean trunkBreakParticles;
@@ -27,7 +30,9 @@ public class Config {
     public static FloatColor inactiveOutlineColor;
     public static FloatColor activeOutlineColor;
 
-    public static void initCommon() {
+    public static void initCommon() { // Create as common-server-priority
+        shiftToVeinmine = true;
+        shiftToTimber = true;
         maxVeinSize = 64;
         maxTrunkSize = 256;
         maxLeavesSize = 256;
@@ -36,6 +41,7 @@ public class Config {
         veinDropPlace = DropPlacements.ORIGIN_POS;
         trunkDropPlace = DropPlacements.WHERE_BROKEN;
         leavesDropPlace = DropPlacements.WHERE_BROKEN;
+        includeLeavesDrops = false; // Only allow changing this if leavesDropPlace is PLAYER_INV or PLAYER_POS
     }
 
     public static void initClient() {
